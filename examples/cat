@@ -1,0 +1,6 @@
+section .text
+
+start:
+    mov *5556, *5555
+    jmp start
+    halt

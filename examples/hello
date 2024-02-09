@@ -1,0 +1,22 @@
+section .data
+    hello: "Hello, world!\n"
+
+
+section .text
+
+print:
+    mov r0, *a0
+.loop:
+    inc a0
+    cmp r0, 0
+    je .exit
+    mov *5556, *a0
+    dec r0
+    jmp .loop
+.exit:
+    ret
+
+start:
+    mov a0, hello
+    call print
+    halt

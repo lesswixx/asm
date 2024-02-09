@@ -1,0 +1,49 @@
+section .text
+
+prob1:
+    mov r0, 0
+.loop:
+    dec a0
+    cmp a0, 0
+    je .exit
+    mov r1, a0 % 3
+    cmp r1, 0
+    je .multiply
+    mov r1, a0 % 5
+    cmp r1, 0
+    jne .loop
+.multiply:
+    mov r0, r0 + a0
+    jmp .loop
+.exit
+    mov a0, r0
+    ret
+
+
+print_uint:
+    mov sp, sp - 11
+    mov r0, sp
+    mov r1, sp
+    mov r2, 0
+.loop:
+    mov a1, a0 % 10
+    mov a1, a1 + 48
+    inc r1
+    mov *r1, a1
+    inc r2
+    mov a0, a0 / 10
+    cmp a0, 0
+    jne .loop
+.exit:
+    mov *r0, r2
+    mov a0, r0
+    call print
+    mov sp, sp + 11
+    ret
+
+
+start:
+    mov a0, 1000
+    call prob1
+    call print_uint
+    halt
