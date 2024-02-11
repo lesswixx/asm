@@ -4,8 +4,19 @@ import argparse
 import re
 import typing
 
-from isa import Arg, ArgType, Opcode, Term, reg_by_str, command_args, opcode_by_str, Code, DataSection, TextSection, \
-    serialize
+from isa import (
+    Arg,
+    ArgType,
+    Code,
+    DataSection,
+    Opcode,
+    Term,
+    TextSection,
+    command_args,
+    opcode_by_str,
+    reg_by_str,
+    serialize,
+)
 
 
 def read_source(src: typing.TextIO) -> str:
@@ -45,7 +56,7 @@ def extract_data_section(lines: list[str]) -> (int, DataSection):
         match = label_pattern.match(line)
         assert match is not None, f'Each constant must start with label, got "{line}"'
         label = match.groups()[0]
-        label_val = line[match.end(0):].strip()
+        label_val = line[match.end(0) :].strip()
         match = string_pattern.match(label_val)
         assert match is not None, f'Unknown label val, got "{label_val}"'
         str_val = match.groups()[0].encode("raw_unicode_escape").decode("unicode_escape")
@@ -89,9 +100,7 @@ def parse_arg(arg: str) -> Arg:
     raise NotImplementedError(f'Unknown argument, got "{arg}"')
 
 
-opts: dict[str, list[Opcode]] = {
-    "mov": [Opcode.MOVE_NUM_TO_REG, Opcode.MOVE_MEMR_TO_REG, Opcode.MOVE_MEMR_TO_MEMX]
-}
+opts: dict[str, list[Opcode]] = {"mov": [Opcode.MOVE_NUM_TO_REG, Opcode.MOVE_MEMR_TO_REG, Opcode.MOVE_MEMR_TO_MEMX]}
 
 
 def replace_special(cmd: str, args: list[Arg]) -> str:
@@ -111,6 +120,31 @@ def replace_special(cmd: str, args: list[Arg]) -> str:
             continue
         return option
     raise NotImplementedError(f"Unexpected special command {cmd} with args {args}")
+
+
+def parse_term(line: str, context: str) -> Term:
+    space_idx = line.find(" ")
+    command = line if space_idx == -1 else line[:space_idx]
+    args = (
+        []
+        if space_idx == -1
+        else list(map(lambda s: parse_arg(s), map(lambda s: s.strip(), line[space_idx + 1 :].split(","))))
+    )
+    for arg in args:
+        if arg.tag == ArgType.LOCAL_LABEL:
+            arg.symbol = f"{context}_{arg.symbol}"
+            arg.tag = ArgType.LABEL
+    command = replace_special(command, args)
+    assert command in command_args, f'Unknown command "{command}"'
+    valid_args = command_args[command]
+    assert len(valid_args) == len(
+        args
+    ), f"Wrong amount of arguments for command {command}, has {len(valid_args)} but got {len(args)}"
+    for j in range(len(args)):
+        assert (
+            args[j].tag in valid_args[j]
+        ), f"Wrong type of argument for command {command}, can be {valid_args[j]} but got {args[j].tag}"
+    return Term(opcode_by_str[command], args)
 
 
 def extract_text_section(lines: list[str]) -> (int, TextSection):
@@ -133,22 +167,7 @@ def extract_text_section(lines: list[str]) -> (int, TextSection):
         if match:
             local_label = match.groups()[0]
             continue
-        space_idx = line.find(" ")
-        command = line if space_idx == -1 else line[:space_idx]
-        args = [] if space_idx == -1 else list(map(lambda s: parse_arg(s), map(lambda s: s.strip(), line[space_idx+1:].split(","))))
-        for arg in args:
-            if arg.tag == ArgType.LOCAL_LABEL:
-                arg.symbol = f"{context}_{arg.symbol}"
-                arg.tag = ArgType.LABEL
-        command = replace_special(command, args)
-        assert command in command_args, f'Unknown command "{command}"'
-        valid_args = command_args[command]
-        assert len(valid_args) == len(args), \
-            f"Wrong amount of arguments for command {command}, has {len(valid_args)} but got {len(args)}"
-        for j in range(len(args)):
-            assert args[j].tag in valid_args[j], \
-                f"Wrong type of argument for command {command}, can be {valid_args[j]} but got {args[j].tag}"
-        term = Term(opcode_by_str[command], args)
+        term = parse_term(line, context)
         if label:
             term.label = label
             label = None

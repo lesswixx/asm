@@ -122,9 +122,8 @@ class Code:
 
 def default_serialize(obj):
     if isinstance(obj, bytearray):
-        return obj.hex(' ')
-    else:
-        return {k: v for k, v in obj.__dict__.items() if v is not None}
+        return obj.hex(" ")
+    return {k: v for k, v in obj.__dict__.items() if v is not None}
 
 
 def serialize(code: Code) -> str:
