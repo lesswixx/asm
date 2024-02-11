@@ -4,7 +4,8 @@ import argparse
 import re
 import typing
 
-from isa import Arg, ArgType, Opcode, Term
+from isa import Arg, ArgType, Opcode, Term, reg_by_str, command_args, opcode_by_str, Code, DataSection, TextSection, \
+    serialize
 
 
 def read_source(src: typing.TextIO) -> str:
@@ -16,11 +17,6 @@ label_pattern = re.compile(r"(\w+):")
 local_label_pattern = re.compile(r".(\w+):")
 
 string_pattern = re.compile(r"\"(.*?)\"")
-
-
-class DataSection:
-    def __init__(self, data: dict[str, bytearray]):
-        self.data = data
 
 
 def int_to_bytes(i: int, size: int) -> bytearray:
@@ -49,72 +45,72 @@ def extract_data_section(lines: list[str]) -> (int, DataSection):
         match = label_pattern.match(line)
         assert match is not None, f'Each constant must start with label, got "{line}"'
         label = match.groups()[0]
-        label_val = line[match.end(0) :].strip()
+        label_val = line[match.end(0):].strip()
         match = string_pattern.match(label_val)
         assert match is not None, f'Unknown label val, got "{label_val}"'
         str_val = match.groups()[0].encode("raw_unicode_escape").decode("unicode_escape")
         binary = bytearray()
+        binary.extend(int_to_bytes(len(str_val), 4))
         for symbol in str_val:
             binary.extend(int_to_bytes(ord(symbol), 4))
         data[label] = binary
     return len(lines), DataSection(data)
 
 
-def parse_mov_command(args: list[str], ctx: str) -> Term:
-    return Term(Opcode.MOVE)
+register_pattern = re.compile(r"((r[0-4])|(a[0-4])|(sp))")
+number_pattern = re.compile(r"(-?[0-9]+)")
+address_exact_pattern = re.compile(r"\*" + number_pattern.pattern)
+address_register_pattern = re.compile(r"\*" + register_pattern.pattern)
+label_arg_pattern = re.compile(r"\w+")
+local_label_arg_pattern = re.compile(r"\.?(\w+)")
 
 
-def parse_inc_command(args: list[str], ctx: str) -> Term:
-    return Term(Opcode.INCREMENT)
+def parse_arg(arg: str) -> Arg:
+    match = address_exact_pattern.fullmatch(arg)
+    if match:
+        return Arg(ArgType.ADDRESS_EXACT, val=int(match.groups()[0]))
+    match = address_register_pattern.fullmatch(arg)
+    if match:
+        reg = reg_by_str[match.groups()[0]]
+        return Arg(ArgType.ADDRESS_REGISTER, reg=reg)
+    match = number_pattern.fullmatch(arg)
+    if match:
+        return Arg(ArgType.NUMBER, val=int(arg))
+    match = register_pattern.fullmatch(arg)
+    if match:
+        reg = reg_by_str[arg]
+        return Arg(ArgType.REGISTER, reg=reg)
+    match = label_arg_pattern.fullmatch(arg)
+    if match:
+        return Arg(ArgType.LABEL, symbol=arg)
+    match = local_label_arg_pattern.fullmatch(arg)
+    if match:
+        return Arg(ArgType.LOCAL_LABEL, symbol=match.groups()[0])
+    raise NotImplementedError(f'Unknown argument, got "{arg}"')
 
 
-def parse_dec_command(args: list[str], ctx: str) -> Term:
-    return Term(Opcode.DECREMENT)
-
-
-def parse_cmp_command(args: list[str], ctx: str) -> Term:
-    return Term(Opcode.COMPARE)
-
-
-def parse_je_command(args: list[str], ctx: str) -> Term:
-    return Term(Opcode.JUMP_EQUAL)
-
-
-def parse_jmp_command(args: list[str], ctx: str) -> Term:
-    return Term(Opcode.JUMP)
-
-
-def parse_call_command(args: list[str], ctx: str) -> Term:
-    return Term(Opcode.CALL)
-
-
-def parse_ret_command(args: list[str], ctx: str) -> Term:
-    return Term(Opcode.RETURN)
-
-
-def parse_halt_command(args: list[str], ctx: str) -> Term:
-    return Term(Opcode.HALT)
-
-
-command_handlers: dict[str, typing.Callable[[list[str], str], Term]] = {
-    "mov": parse_mov_command,
-    "inc": parse_inc_command,
-    "dec": parse_dec_command,
-    "cmp": parse_cmp_command,
-    "je": parse_je_command,
-    "jmp": parse_jmp_command,
-    "call": parse_call_command,
-    "ret": parse_ret_command,
-    "halt": parse_halt_command,
+opts: dict[str, list[Opcode]] = {
+    "mov": [Opcode.MOVE_NUM_TO_REG, Opcode.MOVE_MEMR_TO_REG, Opcode.MOVE_MEMR_TO_MEMX]
 }
 
 
-class TextSection:
-    def __init__(self, terms: list[Term]):
-        assert len(terms) > 0, "Text section cannot be empty"
-        if terms[0].label != "start":
-            terms.insert(0, Term(Opcode.JUMP, [Arg(ArgType.LABEL, symbol="start")]))
-        self.terms = terms
+def replace_special(cmd: str, args: list[Arg]) -> str:
+    if cmd not in opts:
+        return cmd
+    options = opts[cmd]
+    for option in options:
+        valid_args = command_args[option]
+        if len(valid_args) != len(args):
+            continue
+        match = True
+        for i in range(len(args)):
+            if args[i].tag not in valid_args[i]:
+                match = False
+                break
+        if not match:
+            continue
+        return option
+    raise NotImplementedError(f"Unexpected special command {cmd} with args {args}")
 
 
 def extract_text_section(lines: list[str]) -> (int, TextSection):
@@ -139,10 +135,20 @@ def extract_text_section(lines: list[str]) -> (int, TextSection):
             continue
         space_idx = line.find(" ")
         command = line if space_idx == -1 else line[:space_idx]
-        assert command in command_handlers, f'Unknown command "{command}"'
-        handler = command_handlers[command]
-        args = list(map(lambda s: s.strip(), line[space_idx + 1 :].split(",")))
-        term = handler(args, context)
+        args = [] if space_idx == -1 else list(map(lambda s: parse_arg(s), map(lambda s: s.strip(), line[space_idx+1:].split(","))))
+        for arg in args:
+            if arg.tag == ArgType.LOCAL_LABEL:
+                arg.symbol = f"{context}_{arg.symbol}"
+                arg.tag = ArgType.LABEL
+        command = replace_special(command, args)
+        assert command in command_args, f'Unknown command "{command}"'
+        valid_args = command_args[command]
+        assert len(valid_args) == len(args), \
+            f"Wrong amount of arguments for command {command}, has {len(valid_args)} but got {len(args)}"
+        for j in range(len(args)):
+            assert args[j].tag in valid_args[j], \
+                f"Wrong type of argument for command {command}, can be {valid_args[j]} but got {args[j].tag}"
+        term = Term(opcode_by_str[command], args)
         if label:
             term.label = label
             label = None
@@ -151,12 +157,6 @@ def extract_text_section(lines: list[str]) -> (int, TextSection):
             local_label = None
         text.append(term)
     return len(lines), TextSection(text)
-
-
-class Code:
-    def __init__(self, data: DataSection, text: TextSection):
-        self.data = data
-        self.text = text
 
 
 def translate(src: str) -> Code:
@@ -171,7 +171,7 @@ def translate(src: str) -> Code:
 
 
 def write_code(dst: typing.TextIO, code: Code):
-    pass
+    dst.write(serialize(code))
 
 
 def main(src: typing.TextIO, dst: typing.TextIO):
