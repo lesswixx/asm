@@ -194,6 +194,9 @@ def main(src: typing.TextIO, dst: typing.TextIO):
     code = translate(source)
     write_code(dst, code)
 
+    loc, code_instr = len(source.split("\n")), len(code)
+    print(f"LoC: {loc} code instr: {code_instr}")
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Translates code into en executable file.")

@@ -119,6 +119,9 @@ class Code:
         self.data = data
         self.text = text
 
+    def __len__(self):
+        return len(self.text.terms)
+
 
 class WordTag(str, Enum):
     OPCODE = "OPCODE"
@@ -132,6 +135,16 @@ class Word:
         self.op = op
         self.arg = arg
         self.val = val
+
+    def __repr__(self):
+        s = f"{self.tag}"
+        if self.op:
+            s += f" {self.op}"
+        if self.arg:
+            s += f" {self.arg}"
+        if self.val:
+            s += f" {self.val}"
+        return s
 
 
 def ordered_args(term: Term) -> list[Arg]:
@@ -179,5 +192,29 @@ def serialize(code: Code) -> str:
     return json.dumps(words, default=default_serialize, indent=2)
 
 
-def deserialize(string: str):
-    pass
+def deserialize_arg(raw_arg: dict) -> Arg:
+    arg_type = ArgType(raw_arg["tag"])
+    arg = Arg(arg_type)
+    match arg_type:
+        case ArgType.NUMBER | ArgType.ADDRESS_EXACT:
+            arg.val = raw_arg["val"]
+        case ArgType.REGISTER | ArgType.ADDRESS_REGISTER:
+            arg.reg = raw_arg["reg"]
+    return arg
+
+
+def deserialize(string: str) -> list[Word]:
+    words = []
+    raw_words = json.loads(string)
+    for raw_word in raw_words:
+        tag = WordTag(raw_word["tag"])
+        word = Word(tag)
+        match tag:
+            case WordTag.OPCODE:
+                word.op = Opcode(raw_word["op"])
+            case WordTag.ARGUMENT:
+                word.arg = deserialize_arg(raw_word["arg"])
+            case WordTag.BINARY:
+                word.val = raw_word["val"]
+        words.append(word)
+    return words
