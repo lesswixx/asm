@@ -60,11 +60,7 @@ def extract_data_section(lines: list[str]) -> (int, DataSection):
         match = string_pattern.match(label_val)
         assert match is not None, f'Unknown label val, got "{label_val}"'
         str_val = match.groups()[0].encode("raw_unicode_escape").decode("unicode_escape")
-        binary = bytearray()
-        binary.extend(int_to_bytes(len(str_val), 4))
-        for symbol in str_val:
-            binary.extend(int_to_bytes(ord(symbol), 4))
-        data[label] = binary
+        data[label] = str_val
     return len(lines), DataSection(data)
 
 

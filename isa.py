@@ -102,7 +102,7 @@ class Term:
 
 
 class DataSection:
-    def __init__(self, data: dict[str, bytearray]):
+    def __init__(self, data: dict[str, str]):
         self.data = data
 
 
@@ -120,15 +120,64 @@ class Code:
         self.text = text
 
 
+class WordTag(str, Enum):
+    OPCODE = "OPCODE"
+    ARGUMENT = "ARGUMENT"
+    BINARY = "BINARY"
+
+
+class Word:
+    def __init__(self, tag: WordTag, op: Opcode | None = None, arg: Arg | None = None, val: int | None = None):
+        self.tag = tag
+        self.op = op
+        self.arg = arg
+        self.val = val
+
+
+def ordered_args(term: Term) -> list[Arg]:
+    if term.op in (Opcode.MOVE_NUM_TO_REG, Opcode.MOVE_MEMR_TO_REG, Opcode.MOVE_MEMR_TO_MEMX):
+        return term.args[::-1]
+    return term.args
+
+
+def term_to_words(term: Term) -> list[Word]:
+    words = [Word(WordTag.OPCODE, op=term.op)]
+    for arg in ordered_args(term):
+        words.append(Word(WordTag.ARGUMENT, arg=arg))
+    return words
+
+
+def data_to_words(data: str) -> list[Word]:
+    words = [Word(WordTag.BINARY, val=len(data))]
+    for char in data:
+        words.append(Word(WordTag.BINARY, val=ord(char)))
+    return words
+
+
 def default_serialize(obj):
-    if isinstance(obj, bytearray):
-        return obj.hex(" ")
     return {k: v for k, v in obj.__dict__.items() if v is not None}
 
 
 def serialize(code: Code) -> str:
-    return json.dumps(code, default=default_serialize, indent=2)
+    symbol_table = {}
+    words = []
+    for term in code.text.terms:
+        if term.label:
+            symbol_table[term.label] = len(words)
+        words.extend(term_to_words(term))
+    for symbol, data in code.data.data.items():
+        symbol_table[symbol] = len(words)
+        words.extend(data_to_words(data))
+    for word in words:
+        if word.tag == WordTag.ARGUMENT:
+            arg = word.arg
+            assert arg.tag != ArgType.LOCAL_LABEL, f"Found unresolved local label {arg}"
+            if arg.tag == ArgType.LABEL:
+                assert arg.symbol in symbol_table, f"Cant resolve label {arg.symbol}"
+                arg.tag = ArgType.NUMBER
+                arg.val = symbol_table[arg.symbol]
+    return json.dumps(words, default=default_serialize, indent=2)
 
 
-def deserialize(string: str) -> Code:
-    return json.loads(string)
+def deserialize(string: str):
+    pass
