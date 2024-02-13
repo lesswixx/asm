@@ -13,6 +13,7 @@ class Reg(str, Enum):
     A1 = "a1"
     A2 = "a2"
     A3 = "a3"
+    IP = "ip"
     SP = "sp"
     AR = "ar"
     DR = "dr"
@@ -161,7 +162,7 @@ def term_to_words(term: Term) -> list[Word]:
 
 
 def data_to_words(data: str) -> list[Word]:
-    words = [Word(WordTag.BINARY, val=len(data))]
+    words = [Word(WordTag.BINARY, val=0), Word(WordTag.BINARY, val=len(data))]
     for char in data:
         words.append(Word(WordTag.BINARY, val=ord(char)))
     return words

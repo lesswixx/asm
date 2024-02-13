@@ -1,6 +1,6 @@
 section .text
 
 start:
-    mov *5556, *5555
+    mov *1001, *1000
     jmp start
     halt

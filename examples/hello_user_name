@@ -11,7 +11,7 @@ read:
 .loop:
     cmp r0, 0
     je .exit
-    mov *r1, *5555
+    mov *r1, *1000
     cmp *r1, 10
     je .exit
     dec r0
