@@ -64,15 +64,20 @@ def extract_data_section(lines: list[str]) -> (int, DataSection):
     return len(lines), DataSection(data)
 
 
-register_pattern = re.compile(r"((r[0-4])|(a[0-4])|(sp))")
+register_pattern = re.compile(r"((?:r[0-4])|(?:a[0-4])|(?:sp))")
 number_pattern = re.compile(r"(-?[0-9]+)")
 address_exact_pattern = re.compile(r"\*" + number_pattern.pattern)
 address_register_pattern = re.compile(r"\*" + register_pattern.pattern)
 label_arg_pattern = re.compile(r"\w+")
 local_label_arg_pattern = re.compile(r"\.?(\w+)")
+register_op_number_pattern = re.compile(register_pattern.pattern + r"[ \t]*([+\-%])[ \t]*" + number_pattern.pattern)
 
 
 def parse_arg(arg: str) -> Arg:
+    match = register_op_number_pattern.fullmatch(arg)
+    if match:
+        reg = reg_by_str[match.groups()[0]]
+        return Arg(ArgType.REGISTER_OP_NUMBER, reg=reg, op=match.groups()[1], val=int(match.groups()[2]))
     match = address_exact_pattern.fullmatch(arg)
     if match:
         return Arg(ArgType.ADDRESS_EXACT, val=int(match.groups()[0]))
@@ -97,7 +102,8 @@ def parse_arg(arg: str) -> Arg:
 
 
 opts: dict[str, list[Opcode]] = {
-    "mov": [Opcode.MOVE_NUM_TO_REG, Opcode.MOVE_MEMR_TO_REG, Opcode.MOVE_MEMR_TO_MEMX, Opcode.MOVE_MEMX_TO_MEMX]
+    "mov": [Opcode.MOVE_NUM_TO_REG, Opcode.MOVE_NUM_TO_MEM, Opcode.MOVE_REG_TO_REG, Opcode.MOVE_REG_TO_MEM,
+            Opcode.MOVE_MEM_TO_REG, Opcode.MOVE_MEM_TO_MEM, Opcode.MOVE_REG_OP_NUM_TO_REG]
 }
 
 
@@ -111,7 +117,7 @@ def replace_special(cmd: str, args: list[Arg]) -> str:
             continue
         match = True
         for i in range(len(args)):
-            if args[i].tag not in valid_args[i]:
+            if args[i].tag not in valid_args[i][1]:
                 match = False
                 break
         if not match:
@@ -140,7 +146,7 @@ def parse_term(line: str, context: str) -> Term:
     ), f"Wrong amount of arguments for command {command}, has {len(valid_args)} but got {len(args)}"
     for j in range(len(args)):
         assert (
-            args[j].tag in valid_args[j]
+            args[j].tag in valid_args[j][1]
         ), f"Wrong type of argument for command {command}, can be {valid_args[j]} but got {args[j].tag}"
     return Term(opcode_by_str[command], args)
 

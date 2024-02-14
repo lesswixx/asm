@@ -28,15 +28,18 @@ class ArgType(str, Enum):
     ADDRESS_EXACT = "ADDRESS_EXACT"
     ADDRESS_REGISTER = "ADDRESS_REGISTER"
     REGISTER = "REGISTER"
+    REGISTER_OP_NUMBER = "REGISTER_OP_NUMBER"
+    OPERATION = "OPERATION"
     NUMBER = "NUMBER"
 
 
 class Arg:
-    def __init__(self, tag: ArgType, symbol: str | None = None, val: int | None = None, reg: Reg | None = None):
+    def __init__(self, tag: ArgType, symbol: str | None = None, val: int | None = None, reg: Reg | None = None, op: str | None = None):
         self.tag = tag
         self.symbol = symbol
         self.val = val
         self.reg = reg
+        self.op = op
 
     def __repr__(self):
         match self.tag:
@@ -48,6 +51,10 @@ class Arg:
                 s = f"*{self.reg}"
             case ArgType.REGISTER:
                 s = f"{self.reg}"
+            case ArgType.REGISTER_OP_NUMBER:
+                s = f"{self.reg}{self.op}{self.val}"
+            case ArgType.OPERATION:
+                s = f"{self.op}"
             case ArgType.NUMBER:
                 s = f"{self.val}"
             case _:
@@ -57,12 +64,17 @@ class Arg:
 
 class Opcode(str, Enum):
     MOVE_NUM_TO_REG = "movnmtrg"
-    MOVE_MEMR_TO_REG = "movmrtrg"
-    MOVE_MEMR_TO_MEMX = "movmrtmx"
-    MOVE_MEMX_TO_MEMX = "movmxtmx"
+    MOVE_NUM_TO_MEM = "movnmtmm"
+    MOVE_REG_TO_REG = "movrgtrg"
+    MOVE_REG_TO_MEM = "movrgtmm"
+    MOVE_MEM_TO_REG = "movmmtrg"
+    MOVE_MEM_TO_MEM = "movmmtmm"
+    MOVE_REG_OP_NUM_TO_REG = "movrgnmtrg"
     INCREMENT = "inc"
     DECREMENT = "dec"
     COMPARE = "cmp"
+    PUSH = "push"
+    POP = "pop"
     JUMP_EQUAL = "je"
     JUMP = "jmp"
     CALL = "call"
@@ -73,17 +85,22 @@ class Opcode(str, Enum):
 opcode_by_str: dict[str, Opcode] = {op: op for op in Opcode}
 
 
-command_args: dict[str, list[list[ArgType]]] = {
-    Opcode.MOVE_NUM_TO_REG: [[ArgType.REGISTER], [ArgType.NUMBER, ArgType.LABEL]],
-    Opcode.MOVE_MEMR_TO_REG: [[ArgType.REGISTER], [ArgType.ADDRESS_REGISTER]],
-    Opcode.MOVE_MEMR_TO_MEMX: [[ArgType.ADDRESS_EXACT], [ArgType.ADDRESS_REGISTER]],
-    Opcode.MOVE_MEMX_TO_MEMX: [[ArgType.ADDRESS_EXACT], [ArgType.ADDRESS_EXACT]],
-    Opcode.INCREMENT: [[ArgType.REGISTER]],
-    Opcode.DECREMENT: [[ArgType.REGISTER]],
-    Opcode.COMPARE: [[ArgType.REGISTER], [ArgType.NUMBER]],
-    Opcode.JUMP_EQUAL: [[ArgType.LABEL]],
-    Opcode.JUMP: [[ArgType.LABEL]],
-    Opcode.CALL: [[ArgType.LABEL]],
+command_args: dict[str, tuple[int, list[list[ArgType]]]] = {
+    Opcode.MOVE_NUM_TO_REG: [(1, [ArgType.REGISTER]), (0, [ArgType.NUMBER, ArgType.LABEL])],
+    Opcode.MOVE_NUM_TO_MEM: [(1, [ArgType.ADDRESS_REGISTER, ArgType.ADDRESS_EXACT]), (0, [ArgType.NUMBER, ArgType.LABEL])],
+    Opcode.MOVE_REG_TO_REG: [(1, [ArgType.REGISTER]), (0, [ArgType.REGISTER])],
+    Opcode.MOVE_REG_TO_MEM: [(1, [ArgType.ADDRESS_REGISTER, ArgType.ADDRESS_EXACT]), (0, [ArgType.REGISTER])],
+    Opcode.MOVE_MEM_TO_REG: [(1, [ArgType.REGISTER]), (0, [ArgType.ADDRESS_REGISTER, ArgType.ADDRESS_EXACT])],
+    Opcode.MOVE_MEM_TO_MEM: [(1, [ArgType.ADDRESS_EXACT]), (0, [ArgType.ADDRESS_REGISTER])],
+    Opcode.MOVE_REG_OP_NUM_TO_REG: [(1, [ArgType.REGISTER]), (0, [ArgType.REGISTER_OP_NUMBER])],
+    Opcode.INCREMENT: [(0, [ArgType.REGISTER])],
+    Opcode.DECREMENT: [(0, [ArgType.REGISTER])],
+    Opcode.COMPARE: [(0, [ArgType.REGISTER]), (1, [ArgType.NUMBER])],
+    Opcode.PUSH: [(0, [ArgType.REGISTER])],
+    Opcode.POP: [(0, [ArgType.REGISTER])],
+    Opcode.JUMP_EQUAL: [(0, [ArgType.LABEL])],
+    Opcode.JUMP: [(0, [ArgType.LABEL])],
+    Opcode.CALL: [(0, [ArgType.LABEL])],
     Opcode.RETURN: [],
     Opcode.HALT: [],
 }
@@ -151,9 +168,22 @@ class Word:
 
 
 def ordered_args(term: Term) -> list[Arg]:
-    if term.op in (Opcode.MOVE_NUM_TO_REG, Opcode.MOVE_MEMR_TO_REG, Opcode.MOVE_MEMR_TO_MEMX, Opcode.MOVE_MEMX_TO_MEMX):
-        return term.args[::-1]
-    return term.args
+    ord_args = command_args[term.op]
+    args = []
+    for i in range(len(term.args)):
+        for j, ord_arg in enumerate(ord_args):
+            if ord_arg[0] == i:
+                args.append(term.args[j])
+                break
+    assert len(args) == len(ord_args), "Wrong usage of command_args"
+    split_args = []
+    for arg in args:
+        if arg.tag == ArgType.REGISTER_OP_NUMBER:
+            split_args.extend([Arg(ArgType.REGISTER, reg=arg.reg), Arg(ArgType.OPERATION, op=arg.op),
+                               Arg(ArgType.NUMBER, val=arg.val)])
+        else:
+            split_args.append(arg)
+    return split_args
 
 
 def term_to_words(term: Term) -> list[Word]:

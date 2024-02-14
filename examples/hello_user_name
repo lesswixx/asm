@@ -11,14 +11,28 @@ read:
 .loop:
     cmp r0, 0
     je .exit
-    mov *r1, *1000
-    cmp *r1, 10
+    mov a1, *1000
+    cmp a1, 10
     je .exit
+    mov *r1, a1
     dec r0
     inc r2
     jmp .loop
 .exit:
     mov *a0, r2
+    ret
+
+
+print:
+    mov r0, *a0
+.loop:
+    inc a0
+    cmp r0, 0
+    je .exit
+    mov *1001, *a0
+    dec r0
+    jmp .loop
+.exit:
     ret
 
 
