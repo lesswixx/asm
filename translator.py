@@ -96,7 +96,9 @@ def parse_arg(arg: str) -> Arg:
     raise NotImplementedError(f'Unknown argument, got "{arg}"')
 
 
-opts: dict[str, list[Opcode]] = {"mov": [Opcode.MOVE_NUM_TO_REG, Opcode.MOVE_MEMR_TO_REG, Opcode.MOVE_MEMR_TO_MEMX]}
+opts: dict[str, list[Opcode]] = {
+    "mov": [Opcode.MOVE_NUM_TO_REG, Opcode.MOVE_MEMR_TO_REG, Opcode.MOVE_MEMR_TO_MEMX, Opcode.MOVE_MEMX_TO_MEMX]
+}
 
 
 def replace_special(cmd: str, args: list[Arg]) -> str:

@@ -199,6 +199,7 @@ class ControlUnit:
             Opcode.MOVE_NUM_TO_REG: self.execute_move_num_to_reg_instruction,
             Opcode.MOVE_MEMR_TO_REG: self.execute_move_memr_to_reg_instruction,
             Opcode.MOVE_MEMR_TO_MEMX: self.execute_move_memr_to_memx_instruction,
+            Opcode.MOVE_MEMX_TO_MEMX: self.execute_move_memx_to_memx_instruction,
             Opcode.INCREMENT: self.execute_increment_instruction,
             Opcode.DECREMENT: self.execute_decrement_instruction,
             Opcode.COMPARE: self.execute_compare_instruction,
@@ -295,6 +296,20 @@ class ControlUnit:
         self.tick()
         memx = self.fetch_arg()
         assert memx.tag == ArgType.ADDRESS_EXACT, f"Wrong argument of movmrtmx, got {memx}"
+        self.dp.signal_alu(left=memx.val, set_regs=[Reg.AR])
+        self.tick()
+        self.dp.signal_write_memory()
+        self.tick()
+
+    def execute_move_memx_to_memx_instruction(self):
+        memx = self.fetch_arg()
+        assert memx.tag == ArgType.ADDRESS_EXACT, f"Wrong argument of movmxtmx, got {memx}"
+        self.dp.signal_alu(left=memx.val, set_regs=[Reg.AR])
+        self.tick()
+        self.dp.signal_read_memory()
+        self.tick()
+        memx = self.fetch_arg()
+        assert memx.tag == ArgType.ADDRESS_EXACT, f"Wrong argument of movmxtmx, got {memx}"
         self.dp.signal_alu(left=memx.val, set_regs=[Reg.AR])
         self.tick()
         self.dp.signal_write_memory()

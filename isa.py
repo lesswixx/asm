@@ -59,6 +59,7 @@ class Opcode(str, Enum):
     MOVE_NUM_TO_REG = "movnmtrg"
     MOVE_MEMR_TO_REG = "movmrtrg"
     MOVE_MEMR_TO_MEMX = "movmrtmx"
+    MOVE_MEMX_TO_MEMX = "movmxtmx"
     INCREMENT = "inc"
     DECREMENT = "dec"
     COMPARE = "cmp"
@@ -76,6 +77,7 @@ command_args: dict[str, list[list[ArgType]]] = {
     Opcode.MOVE_NUM_TO_REG: [[ArgType.REGISTER], [ArgType.NUMBER, ArgType.LABEL]],
     Opcode.MOVE_MEMR_TO_REG: [[ArgType.REGISTER], [ArgType.ADDRESS_REGISTER]],
     Opcode.MOVE_MEMR_TO_MEMX: [[ArgType.ADDRESS_EXACT], [ArgType.ADDRESS_REGISTER]],
+    Opcode.MOVE_MEMX_TO_MEMX: [[ArgType.ADDRESS_EXACT], [ArgType.ADDRESS_EXACT]],
     Opcode.INCREMENT: [[ArgType.REGISTER]],
     Opcode.DECREMENT: [[ArgType.REGISTER]],
     Opcode.COMPARE: [[ArgType.REGISTER], [ArgType.NUMBER]],
@@ -149,7 +151,7 @@ class Word:
 
 
 def ordered_args(term: Term) -> list[Arg]:
-    if term.op in (Opcode.MOVE_NUM_TO_REG, Opcode.MOVE_MEMR_TO_REG, Opcode.MOVE_MEMR_TO_MEMX):
+    if term.op in (Opcode.MOVE_NUM_TO_REG, Opcode.MOVE_MEMR_TO_REG, Opcode.MOVE_MEMR_TO_MEMX, Opcode.MOVE_MEMX_TO_MEMX):
         return term.args[::-1]
     return term.args
 
