@@ -162,7 +162,7 @@ def term_to_words(term: Term) -> list[Word]:
 
 
 def data_to_words(data: str) -> list[Word]:
-    words = [Word(WordTag.BINARY, val=0), Word(WordTag.BINARY, val=len(data))]
+    words = [Word(WordTag.BINARY, val=len(data))]
     for char in data:
         words.append(Word(WordTag.BINARY, val=ord(char)))
     return words
@@ -179,6 +179,8 @@ def serialize(code: Code) -> str:
         if term.label:
             symbol_table[term.label] = len(words)
         words.extend(term_to_words(term))
+    if len(code.data.data) > 0:
+        words.append(Word(WordTag.BINARY, val=0))
     for symbol, data in code.data.data.items():
         symbol_table[symbol] = len(words)
         words.extend(data_to_words(data))

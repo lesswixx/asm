@@ -110,6 +110,18 @@ class DataPath:
             assert word.tag == WordTag.BINARY, f"Cant write in read-only memory {word.tag}"
             word.val = self.dr
 
+    def negative(self) -> bool:
+        return self.fl & n_flag != 0
+
+    def zero(self) -> bool:
+        return self.fl & z_flag != 0
+
+    def overflow(self) -> bool:
+        return self.fl & v_flag != 0
+
+    def carry(self) -> bool:
+        return self.fl & c_flag != 0
+
     def get_reg_val(self, reg: Reg | None) -> int:
         if reg is None:
             return 0
@@ -150,14 +162,24 @@ class DataPath:
         self.set_regs_from_alu(output, set_regs)
 
     def signal_fetch_opcode(self) -> Opcode:
-        self.ir = self.memory[self.ar]
+        self.ir = self.memory[self.ip]
         assert self.ir.tag == WordTag.OPCODE, f"Cant fetch opcode, next is {self.ir.tag}"
         return self.ir.op
 
     def signal_fetch_arg(self) -> Arg:
-        self.ir = self.memory[self.ar]
+        self.ir = self.memory[self.ip]
         assert self.ir.tag == WordTag.ARGUMENT, f"Cant fetch argument, next is {self.ir.tag}"
         return self.ir.arg
+
+    def __repr__(self):
+        regs_repr = (
+            f"ip={hex(self.ip)}\tar={hex(self.ar)}\tdr={hex(self.dr)}\t"
+            f"a0={hex(self.a0)}\ta1={hex(self.a1)}\ta2={hex(self.a2)}\ta3={hex(self.a3)}\t"
+            f"r0={hex(self.r0)}\tr1={hex(self.r1)}\tr2={hex(self.r2)}\tr3={hex(self.r3)}\t"
+            f"sp={hex(self.sp)}\tfl={hex(self.fl)}"
+        )
+        stack_repr = f"stack_top={'?' if self.sp >= self.memory_size else hex(self.memory[self.sp].val)}"
+        return f"{regs_repr}\t{stack_repr}".expandtabs(10)
 
 
 class ControlUnit:
@@ -169,22 +191,29 @@ class ControlUnit:
             Opcode.HALT: self.execute_halt_control_instruction,
             Opcode.CALL: self.execute_call_control_instruction,
             Opcode.RETURN: self.execute_return_control_instruction,
+            Opcode.JUMP_EQUAL: self.execute_jump_equal_control_instruction,
+            Opcode.JUMP: self.execute_jump_control_instruction,
         }
 
-        self.ordinary_instruction_executors: dict[Opcode, typing.Callable[[], None]] = {}
+        self.ordinary_instruction_executors: dict[Opcode, typing.Callable[[], None]] = {
+            Opcode.MOVE_NUM_TO_REG: self.execute_move_num_to_reg_instruction,
+            Opcode.MOVE_MEMR_TO_REG: self.execute_move_memr_to_reg_instruction,
+            Opcode.MOVE_MEMR_TO_MEMX: self.execute_move_memr_to_memx_instruction,
+            Opcode.INCREMENT: self.execute_increment_instruction,
+            Opcode.DECREMENT: self.execute_decrement_instruction,
+            Opcode.COMPARE: self.execute_compare_instruction,
+        }
 
     def tick(self):
         self.ticks += 1
 
     def fetch_opcode(self) -> Opcode:
-        self.dp.signal_alu(left=self.dp.ip, set_regs=[Reg.AR])
-        self.tick()
         op = self.dp.signal_fetch_opcode()
         self.tick()
         return op
 
     def fetch_arg(self) -> Arg:
-        self.dp.signal_alu(left=self.dp.ip, right=1, set_regs=[Reg.IP, Reg.AR])
+        self.dp.signal_alu(left=self.dp.ip, right=1, set_regs=[Reg.IP])
         self.tick()
         arg = self.dp.signal_fetch_arg()
         self.tick()
@@ -215,23 +244,101 @@ class ControlUnit:
         self.dp.signal_alu(left=self.dp.sp, right=1, set_regs=[Reg.SP])
         self.tick()
 
+    def execute_jump_equal_control_instruction(self):
+        arg = self.fetch_arg()
+        assert arg.tag == ArgType.NUMBER, f"Wrong argument of je, got {arg}"
+        if self.dp.zero():
+            self.dp.signal_alu(left=arg.val, set_regs=[Reg.IP])
+            self.tick()
+        else:
+            self.dp.signal_alu(left=self.dp.ip, right=1, set_regs=[Reg.IP])
+            self.tick()
+
+    def execute_jump_control_instruction(self):
+        arg = self.fetch_arg()
+        assert arg.tag == ArgType.NUMBER, f"Wrong argument of jmp, got {arg}"
+        self.dp.signal_alu(left=arg.val, set_regs=[Reg.IP])
+        self.tick()
+
     def execute_control_instruction(self, op: Opcode) -> bool:
         if op not in self.control_instruction_executors:
             return False
         self.control_instruction_executors[op]()
         return True
 
+    def execute_move_num_to_reg_instruction(self):
+        num = self.fetch_arg()
+        assert num.tag == ArgType.NUMBER, f"Wrong argument of movnmtrg, got {num}"
+        reg = self.fetch_arg()
+        assert reg.tag == ArgType.REGISTER, f"Wrong argument of movnmtrg, got {reg}"
+        self.dp.signal_alu(left=num.val, set_regs=[reg.reg])
+        self.tick()
+
+    def execute_move_memr_to_reg_instruction(self):
+        memr = self.fetch_arg()
+        assert memr.tag == ArgType.ADDRESS_REGISTER, f"Wrong argument of movmrtrg, got {memr}"
+        self.dp.signal_alu(left=self.dp.get_reg_val(memr.reg), set_regs=[Reg.AR])
+        self.tick()
+        self.dp.signal_read_memory()
+        self.tick()
+        reg = self.fetch_arg()
+        assert reg.tag == ArgType.REGISTER, f"Wrong argument of movmrtrg, got {reg}"
+        self.dp.signal_alu(left=self.dp.dr, set_regs=[reg.reg])
+        self.tick()
+
+    def execute_move_memr_to_memx_instruction(self):
+        memr = self.fetch_arg()
+        assert memr.tag == ArgType.ADDRESS_REGISTER, f"Wrong argument of movmrtmx, got {memr}"
+        self.dp.signal_alu(left=self.dp.get_reg_val(memr.reg), set_regs=[Reg.AR])
+        self.tick()
+        self.dp.signal_read_memory()
+        self.tick()
+        memx = self.fetch_arg()
+        assert memx.tag == ArgType.ADDRESS_EXACT, f"Wrong argument of movmrtmx, got {memx}"
+        self.dp.signal_alu(left=memx.val, set_regs=[Reg.AR])
+        self.tick()
+        self.dp.signal_write_memory()
+        self.tick()
+
+    def execute_increment_instruction(self):
+        reg = self.fetch_arg()
+        assert reg.tag == ArgType.REGISTER, f"Wrong argument of inc, got {reg}"
+        self.dp.signal_alu(left=self.dp.get_reg_val(reg.reg), right=1, set_regs=[reg.reg])
+        self.tick()
+
+    def execute_decrement_instruction(self):
+        reg = self.fetch_arg()
+        assert reg.tag == ArgType.REGISTER, f"Wrong argument of dec, got {reg}"
+        self.dp.signal_alu(left=self.dp.get_reg_val(reg.reg), right=1, alu_op=AluOp.SUB, set_regs=[reg.reg])
+        self.tick()
+
+    def execute_compare_instruction(self):
+        reg = self.fetch_arg()
+        assert reg.tag == ArgType.REGISTER, f"Wrong argument of cmp, got {reg}"
+        num = self.fetch_arg()
+        assert num.tag == ArgType.NUMBER, f"Wrong argument of cmp, got {num}"
+        self.dp.signal_alu(left=self.dp.get_reg_val(reg.reg), right=num.val, set_flags=True)
+        self.tick()
+
     def execute_ordinary_instruction(self, op: Opcode):
         assert op in self.ordinary_instruction_executors, f"Unknown instruction, got {op}"
         self.ordinary_instruction_executors[op]()
+        self.dp.signal_alu(left=self.dp.ip, right=1, set_regs=[Reg.IP])
+        self.tick()
 
     def execute_next_instruction(self):
         op = self.dp.signal_fetch_opcode()
+        logging.debug(f"{op.name}\t{self}".expandtabs(20))
         if not self.execute_control_instruction(op):
             self.execute_ordinary_instruction(op)
 
+    def __repr__(self):
+        state_repr = f"tick={self.ticks}"
+        dp_repr = f"{self.dp}"
+        return f"{state_repr}\t{dp_repr}".expandtabs(10)
 
-def simulation(code: list[Word], input_tokens: list[str], data_memory_size: int = 0x7FF, limit: int = 1_000):
+
+def simulation(code: list[Word], input_tokens: list[str], data_memory_size: int = 0x800, limit: int = 1_000):
     data_path = DataPath(data_memory_size, code, input_tokens)
     control_unit = ControlUnit(data_path)
     instruction_proceed = 0
@@ -252,9 +359,14 @@ def simulation(code: list[Word], input_tokens: list[str], data_memory_size: int 
 
 
 def main(src: typing.TextIO, in_file: typing.TextIO):
+    logging.getLogger().setLevel(logging.DEBUG)
+
     code = read_code(src)
     input_tokens = read_input(in_file)
-    simulation(code, input_tokens)
+    output, instr, ticks = simulation(code, input_tokens)
+
+    logging.info(f"instr: {instr} ticks: {ticks}")
+    print(output)
 
 
 if __name__ == "__main__":
