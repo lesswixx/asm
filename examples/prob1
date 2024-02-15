@@ -13,32 +13,44 @@ prob1:
     cmp r1, 0
     jne .loop
 .multiply:
-    mov r0, r0 + a0
+    add r0, a0
     jmp .loop
-.exit
+.exit:
     mov a0, r0
     ret
 
 
+print:
+    mov r0, *a0
+.loop:
+    inc a0
+    cmp r0, 0
+    je .exit
+    mov *1001, *a0
+    dec r0
+    jmp .loop
+.exit:
+    ret
+
+
 print_uint:
-    mov sp, sp - 11
-    mov r0, sp
-    mov r1, sp
-    mov r2, 0
+    sub sp, 11
+    mov r0, sp + 10
+    mov r1, 0
 .loop:
     mov a1, a0 % 10
-    mov a1, a1 + 48
+    add a1, 48
+    mov *r0, a1
+    dec r0
     inc r1
-    mov *r1, a1
-    inc r2
-    mov a0, a0 / 10
+    div a0, 10
     cmp a0, 0
     jne .loop
 .exit:
-    mov *r0, r2
+    mov *r0, r1
     mov a0, r0
     call print
-    mov sp, sp + 11
+    add sp, 11
     ret
 
 

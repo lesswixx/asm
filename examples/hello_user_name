@@ -38,7 +38,7 @@ print:
 
 
 start:
-    mov sp, sp - 129
+    sub sp, 129
     mov a0, sp
     mov *a0, 128
     call read
@@ -49,4 +49,5 @@ start:
     call print
     mov a0, hello_end
     call print
+    add sp, 129
     halt

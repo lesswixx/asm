@@ -70,19 +70,25 @@ class Arg:
 
 
 class Opcode(str, Enum):
-    MOVE_NUM_TO_REG = "movnmtrg"
-    MOVE_NUM_TO_MEM = "movnmtmm"
-    MOVE_REG_TO_REG = "movrgtrg"
-    MOVE_REG_TO_MEM = "movrgtmm"
-    MOVE_MEM_TO_REG = "movmmtrg"
-    MOVE_MEM_TO_MEM = "movmmtmm"
-    MOVE_REG_OP_NUM_TO_REG = "movrgnmtrg"
+    MOVE_NUM_TO_REG = "movnum2reg"
+    MOVE_NUM_TO_MEM = "movnum2mem"
+    MOVE_REG_TO_REG = "movreg2reg"
+    MOVE_REG_TO_MEM = "movreg2mem"
+    MOVE_MEM_TO_REG = "movmem2reg"
+    MOVE_MEM_TO_MEM = "movmem2mem"
+    MOVE_REG_OP_NUM_TO_REG = "movregnum2reg"
     INCREMENT = "inc"
     DECREMENT = "dec"
+    ADD = "add"
+    ADD_REG = "addreg"
+    SUBTRACT = "sub"
+    DIVIDE = "div"
+    MODULO = "mod"
     COMPARE = "cmp"
     PUSH = "push"
     POP = "pop"
     JUMP_EQUAL = "je"
+    JUMP_NOT_EQUAL = "jne"
     JUMP = "jmp"
     CALL = "call"
     RETURN = "ret"
@@ -90,6 +96,10 @@ class Opcode(str, Enum):
 
 
 opcode_by_str: dict[str, Opcode] = {op: op for op in Opcode}
+
+
+REG_TYPE = [ArgType.REGISTER]
+NUMBER_TYPE = [ArgType.NUMBER, ArgType.LABEL]
 
 
 command_args: dict[str, tuple[int, list[list[ArgType]]]] = {
@@ -108,10 +118,16 @@ command_args: dict[str, tuple[int, list[list[ArgType]]]] = {
     Opcode.MOVE_REG_OP_NUM_TO_REG: [(1, [ArgType.REGISTER]), (0, [ArgType.REGISTER_OP_NUMBER])],
     Opcode.INCREMENT: [(0, [ArgType.REGISTER])],
     Opcode.DECREMENT: [(0, [ArgType.REGISTER])],
+    Opcode.ADD: [(0, [ArgType.REGISTER]), (1, [ArgType.NUMBER])],
+    Opcode.ADD_REG: [(0, [ArgType.REGISTER]), (1, [ArgType.REGISTER])],
+    Opcode.SUBTRACT: [(0, [ArgType.REGISTER]), (1, [ArgType.NUMBER])],
+    Opcode.DIVIDE: [(0, [ArgType.REGISTER]), (1, [ArgType.NUMBER])],
+    Opcode.MODULO: [(0, [ArgType.REGISTER]), (1, [ArgType.NUMBER])],
     Opcode.COMPARE: [(0, [ArgType.REGISTER]), (1, [ArgType.NUMBER])],
     Opcode.PUSH: [(0, [ArgType.REGISTER])],
     Opcode.POP: [(0, [ArgType.REGISTER])],
     Opcode.JUMP_EQUAL: [(0, [ArgType.LABEL])],
+    Opcode.JUMP_NOT_EQUAL: [(0, [ArgType.LABEL])],
     Opcode.JUMP: [(0, [ArgType.LABEL])],
     Opcode.CALL: [(0, [ArgType.LABEL])],
     Opcode.RETURN: [],

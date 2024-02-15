@@ -70,7 +70,7 @@ address_exact_pattern = re.compile(r"\*" + number_pattern.pattern)
 address_register_pattern = re.compile(r"\*" + register_pattern.pattern)
 label_arg_pattern = re.compile(r"\w+")
 local_label_arg_pattern = re.compile(r"\.?(\w+)")
-register_op_number_pattern = re.compile(register_pattern.pattern + r"[ \t]*([+\-%])[ \t]*" + number_pattern.pattern)
+register_op_number_pattern = re.compile(register_pattern.pattern + r"[ \t]*([+\-/%])[ \t]*" + number_pattern.pattern)
 
 
 def parse_arg(arg: str) -> Arg:
@@ -110,7 +110,8 @@ opts: dict[str, list[Opcode]] = {
         Opcode.MOVE_MEM_TO_REG,
         Opcode.MOVE_MEM_TO_MEM,
         Opcode.MOVE_REG_OP_NUM_TO_REG,
-    ]
+    ],
+    "add": [Opcode.ADD, Opcode.ADD_REG],
 }
 
 

@@ -28,8 +28,9 @@ OUTPUT_ADDRESS = 1001
 
 
 class AluOp(Enum):
-    SUM = "+"
+    ADD = "+"
     SUB = "-"
+    DIV = "/"
     MOD = "%"
 
 
@@ -129,12 +130,16 @@ class DataPath:
 
     def alu(self, left: int, right: int, op: AluOp, set_flags: bool) -> int:
         if op == AluOp.SUB:
-            op = AluOp.SUM
+            op = AluOp.ADD
             right = -right
-        if op == AluOp.SUM:
+        if op == AluOp.ADD:
             output, flags = alu_sum(left & mask_32, right & mask_32)
             if set_flags:
                 self.fl = flags
+        elif op == AluOp.DIV:
+            assert left >= 0, f"div can performed only with non-negatives, got left={left}"
+            assert right > 0, f"div can performed only with positive argument, got right={right}"
+            output = left // right
         elif op == AluOp.MOD:
             assert left >= 0, f"mod can performed only with non-negatives, got left={left}"
             assert right > 0, f"mod can performed only with positive argument, got right={right}"
@@ -151,7 +156,7 @@ class DataPath:
         self,
         left: int = 0,
         right: int = 0,
-        alu_op: AluOp = AluOp.SUM,
+        alu_op: AluOp = AluOp.ADD,
         set_regs: list[Reg] | None = None,
         set_flags: bool = False,
     ):
@@ -193,6 +198,7 @@ class ControlUnit:
             Opcode.CALL: self.execute_call_control_instruction,
             Opcode.RETURN: self.execute_return_control_instruction,
             Opcode.JUMP_EQUAL: self.execute_jump_equal_control_instruction,
+            Opcode.JUMP_NOT_EQUAL: self.execute_jump_not_equal_control_instruction,
             Opcode.JUMP: self.execute_jump_control_instruction,
         }
 
@@ -206,6 +212,11 @@ class ControlUnit:
             Opcode.MOVE_REG_OP_NUM_TO_REG: self.execute_move_reg_op_num_to_reg_instruction,
             Opcode.INCREMENT: self.execute_increment_instruction,
             Opcode.DECREMENT: self.execute_decrement_instruction,
+            Opcode.ADD: self.execute_add_instruction,
+            Opcode.ADD_REG: self.execute_add_reg_instruction,
+            Opcode.SUBTRACT: self.execute_subtract_instruction,
+            Opcode.DIVIDE: self.execute_divide_instruction,
+            Opcode.MODULO: self.execute_modulo_instruction,
             Opcode.COMPARE: self.execute_compare_instruction,
             Opcode.PUSH: self.execute_push_instruction,
             Opcode.POP: self.execute_pop_instruction,
@@ -257,6 +268,15 @@ class ControlUnit:
     def execute_jump_equal_control_instruction(self):
         arg = self.fetch_arg([ArgType.NUMBER])
         if self.dp.zero():
+            self.dp.signal_alu(left=arg.val, set_regs=[Reg.IP])
+            self.tick()
+        else:
+            self.dp.signal_alu(left=self.dp.ip, right=1, set_regs=[Reg.IP])
+            self.tick()
+
+    def execute_jump_not_equal_control_instruction(self):
+        arg = self.fetch_arg([ArgType.NUMBER])
+        if not self.dp.zero():
             self.dp.signal_alu(left=arg.val, set_regs=[Reg.IP])
             self.tick()
         else:
@@ -342,6 +362,30 @@ class ControlUnit:
         self.dp.signal_alu(left=self.dp.get_reg_val(reg.reg), right=1, alu_op=AluOp.SUB, set_regs=[reg.reg])
         self.tick()
 
+    def execute_reg_math(self, op: AluOp):
+        reg = self.fetch_arg([ArgType.REGISTER])
+        num = self.fetch_arg([ArgType.NUMBER])
+        self.dp.signal_alu(left=self.dp.get_reg_val(reg.reg), right=num.val, alu_op=op, set_regs=[reg.reg])
+        self.tick()
+
+    def execute_add_instruction(self):
+        self.execute_reg_math(AluOp.ADD)
+
+    def execute_add_reg_instruction(self):
+        src = self.fetch_arg([ArgType.REGISTER])
+        dst = self.fetch_arg([ArgType.REGISTER])
+        self.dp.signal_alu(left=self.dp.get_reg_val(src.reg), right=self.dp.get_reg_val(dst.reg), set_regs=[src.reg])
+        self.tick()
+
+    def execute_subtract_instruction(self):
+        self.execute_reg_math(AluOp.SUB)
+
+    def execute_divide_instruction(self):
+        self.execute_reg_math(AluOp.DIV)
+
+    def execute_modulo_instruction(self):
+        self.execute_reg_math(AluOp.MOD)
+
     def execute_compare_instruction(self):
         reg = self.fetch_arg([ArgType.REGISTER])
         num = self.fetch_arg([ArgType.NUMBER])
@@ -380,7 +424,7 @@ class ControlUnit:
         return f"{state_repr}\t{dp_repr}".expandtabs(10)
 
 
-def simulation(code: list[Word], input_tokens: list[str], data_memory_size: int = 0x800, limit: int = 1_000):
+def simulation(code: list[Word], input_tokens: list[str], data_memory_size: int = 0x800, limit: int = 10_000):
     data_path = DataPath(data_memory_size, code, input_tokens)
     control_unit = ControlUnit(data_path)
     instruction_proceed = 0
