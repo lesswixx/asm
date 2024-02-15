@@ -102,8 +102,15 @@ def parse_arg(arg: str) -> Arg:
 
 
 opts: dict[str, list[Opcode]] = {
-    "mov": [Opcode.MOVE_NUM_TO_REG, Opcode.MOVE_NUM_TO_MEM, Opcode.MOVE_REG_TO_REG, Opcode.MOVE_REG_TO_MEM,
-            Opcode.MOVE_MEM_TO_REG, Opcode.MOVE_MEM_TO_MEM, Opcode.MOVE_REG_OP_NUM_TO_REG]
+    "mov": [
+        Opcode.MOVE_NUM_TO_REG,
+        Opcode.MOVE_NUM_TO_MEM,
+        Opcode.MOVE_REG_TO_REG,
+        Opcode.MOVE_REG_TO_MEM,
+        Opcode.MOVE_MEM_TO_REG,
+        Opcode.MOVE_MEM_TO_MEM,
+        Opcode.MOVE_REG_OP_NUM_TO_REG,
+    ]
 }
 
 

@@ -16,6 +16,7 @@ read:
     je .exit
     mov *r1, a1
     dec r0
+    inc r1
     inc r2
     jmp .loop
 .exit:

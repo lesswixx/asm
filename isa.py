@@ -34,7 +34,14 @@ class ArgType(str, Enum):
 
 
 class Arg:
-    def __init__(self, tag: ArgType, symbol: str | None = None, val: int | None = None, reg: Reg | None = None, op: str | None = None):
+    def __init__(
+        self,
+        tag: ArgType,
+        symbol: str | None = None,
+        val: int | None = None,
+        reg: Reg | None = None,
+        op: str | None = None,
+    ):
         self.tag = tag
         self.symbol = symbol
         self.val = val
@@ -87,11 +94,17 @@ opcode_by_str: dict[str, Opcode] = {op: op for op in Opcode}
 
 command_args: dict[str, tuple[int, list[list[ArgType]]]] = {
     Opcode.MOVE_NUM_TO_REG: [(1, [ArgType.REGISTER]), (0, [ArgType.NUMBER, ArgType.LABEL])],
-    Opcode.MOVE_NUM_TO_MEM: [(1, [ArgType.ADDRESS_REGISTER, ArgType.ADDRESS_EXACT]), (0, [ArgType.NUMBER, ArgType.LABEL])],
+    Opcode.MOVE_NUM_TO_MEM: [
+        (1, [ArgType.ADDRESS_REGISTER, ArgType.ADDRESS_EXACT]),
+        (0, [ArgType.NUMBER, ArgType.LABEL]),
+    ],
     Opcode.MOVE_REG_TO_REG: [(1, [ArgType.REGISTER]), (0, [ArgType.REGISTER])],
     Opcode.MOVE_REG_TO_MEM: [(1, [ArgType.ADDRESS_REGISTER, ArgType.ADDRESS_EXACT]), (0, [ArgType.REGISTER])],
     Opcode.MOVE_MEM_TO_REG: [(1, [ArgType.REGISTER]), (0, [ArgType.ADDRESS_REGISTER, ArgType.ADDRESS_EXACT])],
-    Opcode.MOVE_MEM_TO_MEM: [(1, [ArgType.ADDRESS_EXACT]), (0, [ArgType.ADDRESS_REGISTER])],
+    Opcode.MOVE_MEM_TO_MEM: [
+        (1, [ArgType.ADDRESS_REGISTER, ArgType.ADDRESS_EXACT]),
+        (0, [ArgType.ADDRESS_REGISTER, ArgType.ADDRESS_EXACT]),
+    ],
     Opcode.MOVE_REG_OP_NUM_TO_REG: [(1, [ArgType.REGISTER]), (0, [ArgType.REGISTER_OP_NUMBER])],
     Opcode.INCREMENT: [(0, [ArgType.REGISTER])],
     Opcode.DECREMENT: [(0, [ArgType.REGISTER])],
@@ -179,8 +192,13 @@ def ordered_args(term: Term) -> list[Arg]:
     split_args = []
     for arg in args:
         if arg.tag == ArgType.REGISTER_OP_NUMBER:
-            split_args.extend([Arg(ArgType.REGISTER, reg=arg.reg), Arg(ArgType.OPERATION, op=arg.op),
-                               Arg(ArgType.NUMBER, val=arg.val)])
+            split_args.extend(
+                [
+                    Arg(ArgType.REGISTER, reg=arg.reg),
+                    Arg(ArgType.OPERATION, op=arg.op),
+                    Arg(ArgType.NUMBER, val=arg.val),
+                ]
+            )
         else:
             split_args.append(arg)
     return split_args
@@ -235,6 +253,8 @@ def deserialize_arg(raw_arg: dict) -> Arg:
             arg.val = raw_arg["val"]
         case ArgType.REGISTER | ArgType.ADDRESS_REGISTER:
             arg.reg = raw_arg["reg"]
+        case ArgType.OPERATION:
+            arg.op = raw_arg["op"]
     return arg
 
 
