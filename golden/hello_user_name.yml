@@ -1,0 +1,961 @@
+in_source: |
+  section .data
+      hello_begin: "Hello, "
+      hello_end: "!"
+
+  section .text
+
+  read:
+      mov r0, *a0
+      mov r1, a0 + 1
+      mov r2, 0
+  .loop:
+      cmp r0, 0
+      je .exit
+      mov a1, *1000
+      cmp a1, 10
+      je .exit
+      mov *r1, a1
+      dec r0
+      inc r1
+      inc r2
+      jmp .loop
+  .exit:
+      mov *a0, r2
+      ret
+
+
+  print:
+      mov r0, *a0
+  .loop:
+      inc a0
+      cmp r0, 0
+      je .exit
+      mov *1001, *a0
+      dec r0
+      jmp .loop
+  .exit:
+      ret
+
+
+  start:
+      sub sp, 129
+      mov a0, sp
+      mov *a0, 128
+      call read
+      push a0
+      mov a0, hello_begin
+      call print
+      pop a0
+      call print
+      mov a0, hello_end
+      call print
+      add sp, 129
+      halt
+in_stdin: |
+  Egor
+
+out_code: |-
+  [
+    {
+      "tag": "OPCODE",
+      "op": "jmp"
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "NUMBER",
+        "symbol": "start",
+        "val": 59
+      }
+    },
+    {
+      "tag": "OPCODE",
+      "op": "movmem2reg"
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "ADDRESS_REGISTER",
+        "reg": "a0"
+      }
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "REGISTER",
+        "reg": "r0"
+      }
+    },
+    {
+      "tag": "OPCODE",
+      "op": "movregnum2reg"
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "REGISTER",
+        "reg": "a0"
+      }
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "OPERATION",
+        "op": "+"
+      }
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "NUMBER",
+        "val": 1
+      }
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "REGISTER",
+        "reg": "r1"
+      }
+    },
+    {
+      "tag": "OPCODE",
+      "op": "movnum2reg"
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "NUMBER",
+        "val": 0
+      }
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "REGISTER",
+        "reg": "r2"
+      }
+    },
+    {
+      "tag": "OPCODE",
+      "op": "cmp"
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "REGISTER",
+        "reg": "r0"
+      }
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "NUMBER",
+        "val": 0
+      }
+    },
+    {
+      "tag": "OPCODE",
+      "op": "je"
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "NUMBER",
+        "symbol": "read_exit",
+        "val": 37
+      }
+    },
+    {
+      "tag": "OPCODE",
+      "op": "movmem2reg"
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "ADDRESS_EXACT",
+        "val": 1000
+      }
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "REGISTER",
+        "reg": "a1"
+      }
+    },
+    {
+      "tag": "OPCODE",
+      "op": "cmp"
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "REGISTER",
+        "reg": "a1"
+      }
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "NUMBER",
+        "val": 10
+      }
+    },
+    {
+      "tag": "OPCODE",
+      "op": "je"
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "NUMBER",
+        "symbol": "read_exit",
+        "val": 37
+      }
+    },
+    {
+      "tag": "OPCODE",
+      "op": "movreg2mem"
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "REGISTER",
+        "reg": "a1"
+      }
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "ADDRESS_REGISTER",
+        "reg": "r1"
+      }
+    },
+    {
+      "tag": "OPCODE",
+      "op": "dec"
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "REGISTER",
+        "reg": "r0"
+      }
+    },
+    {
+      "tag": "OPCODE",
+      "op": "inc"
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "REGISTER",
+        "reg": "r1"
+      }
+    },
+    {
+      "tag": "OPCODE",
+      "op": "inc"
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "REGISTER",
+        "reg": "r2"
+      }
+    },
+    {
+      "tag": "OPCODE",
+      "op": "jmp"
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "NUMBER",
+        "symbol": "read_loop",
+        "val": 13
+      }
+    },
+    {
+      "tag": "OPCODE",
+      "op": "movreg2mem"
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "REGISTER",
+        "reg": "r2"
+      }
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "ADDRESS_REGISTER",
+        "reg": "a0"
+      }
+    },
+    {
+      "tag": "OPCODE",
+      "op": "ret"
+    },
+    {
+      "tag": "OPCODE",
+      "op": "movmem2reg"
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "ADDRESS_REGISTER",
+        "reg": "a0"
+      }
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "REGISTER",
+        "reg": "r0"
+      }
+    },
+    {
+      "tag": "OPCODE",
+      "op": "inc"
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "REGISTER",
+        "reg": "a0"
+      }
+    },
+    {
+      "tag": "OPCODE",
+      "op": "cmp"
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "REGISTER",
+        "reg": "r0"
+      }
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "NUMBER",
+        "val": 0
+      }
+    },
+    {
+      "tag": "OPCODE",
+      "op": "je"
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "NUMBER",
+        "symbol": "print_exit",
+        "val": 58
+      }
+    },
+    {
+      "tag": "OPCODE",
+      "op": "movmem2mem"
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "ADDRESS_REGISTER",
+        "reg": "a0"
+      }
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "ADDRESS_EXACT",
+        "val": 1001
+      }
+    },
+    {
+      "tag": "OPCODE",
+      "op": "dec"
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "REGISTER",
+        "reg": "r0"
+      }
+    },
+    {
+      "tag": "OPCODE",
+      "op": "jmp"
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "NUMBER",
+        "symbol": "print_loop",
+        "val": 44
+      }
+    },
+    {
+      "tag": "OPCODE",
+      "op": "ret"
+    },
+    {
+      "tag": "OPCODE",
+      "op": "sub"
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "REGISTER",
+        "reg": "sp"
+      }
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "NUMBER",
+        "val": 129
+      }
+    },
+    {
+      "tag": "OPCODE",
+      "op": "movreg2reg"
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "REGISTER",
+        "reg": "sp"
+      }
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "REGISTER",
+        "reg": "a0"
+      }
+    },
+    {
+      "tag": "OPCODE",
+      "op": "movnum2mem"
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "NUMBER",
+        "val": 128
+      }
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "ADDRESS_REGISTER",
+        "reg": "a0"
+      }
+    },
+    {
+      "tag": "OPCODE",
+      "op": "call"
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "NUMBER",
+        "symbol": "read",
+        "val": 2
+      }
+    },
+    {
+      "tag": "OPCODE",
+      "op": "push"
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "REGISTER",
+        "reg": "a0"
+      }
+    },
+    {
+      "tag": "OPCODE",
+      "op": "movnum2reg"
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "NUMBER",
+        "symbol": "hello_begin",
+        "val": 91
+      }
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "REGISTER",
+        "reg": "a0"
+      }
+    },
+    {
+      "tag": "OPCODE",
+      "op": "call"
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "NUMBER",
+        "symbol": "print",
+        "val": 41
+      }
+    },
+    {
+      "tag": "OPCODE",
+      "op": "pop"
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "REGISTER",
+        "reg": "a0"
+      }
+    },
+    {
+      "tag": "OPCODE",
+      "op": "call"
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "NUMBER",
+        "symbol": "print",
+        "val": 41
+      }
+    },
+    {
+      "tag": "OPCODE",
+      "op": "movnum2reg"
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "NUMBER",
+        "symbol": "hello_end",
+        "val": 99
+      }
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "REGISTER",
+        "reg": "a0"
+      }
+    },
+    {
+      "tag": "OPCODE",
+      "op": "call"
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "NUMBER",
+        "symbol": "print",
+        "val": 41
+      }
+    },
+    {
+      "tag": "OPCODE",
+      "op": "add"
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "REGISTER",
+        "reg": "sp"
+      }
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "NUMBER",
+        "val": 129
+      }
+    },
+    {
+      "tag": "OPCODE",
+      "op": "halt"
+    },
+    {
+      "tag": "BINARY",
+      "val": 0
+    },
+    {
+      "tag": "BINARY",
+      "val": 7
+    },
+    {
+      "tag": "BINARY",
+      "val": 72
+    },
+    {
+      "tag": "BINARY",
+      "val": 101
+    },
+    {
+      "tag": "BINARY",
+      "val": 108
+    },
+    {
+      "tag": "BINARY",
+      "val": 108
+    },
+    {
+      "tag": "BINARY",
+      "val": 111
+    },
+    {
+      "tag": "BINARY",
+      "val": 44
+    },
+    {
+      "tag": "BINARY",
+      "val": 32
+    },
+    {
+      "tag": "BINARY",
+      "val": 1
+    },
+    {
+      "tag": "BINARY",
+      "val": 33
+    }
+  ]
+
+out_stdout: |
+  LoC: 54 code instr: 37
+  Hello, Egor!
+
+out_log: |
+  DEBUG   machine:execute_next_instruction tick=0      ip=0x0     ar=0x0     dr=0x0     a0=0x0     a1=0x0     a2=0x0     a3=0x0     r0=0x0     r1=0x0     r2=0x0     r3=0x0     sp=0x800   fl=0x0     stack_top=?
+  DEBUG   machine:execute_next_instruction JUMP
+  DEBUG   machine:execute_next_instruction tick=3      ip=0x3b    ar=0x0     dr=0x0     a0=0x0     a1=0x0     a2=0x0     a3=0x0     r0=0x0     r1=0x0     r2=0x0     r3=0x0     sp=0x800   fl=0x0     stack_top=?
+  DEBUG   machine:execute_next_instruction SUBTRACT
+  DEBUG   machine:execute_next_instruction tick=9      ip=0x3e    ar=0x0     dr=0x0     a0=0x0     a1=0x0     a2=0x0     a3=0x0     r0=0x0     r1=0x0     r2=0x0     r3=0x0     sp=0x77f   fl=0x0     stack_top=0x0
+  DEBUG   machine:execute_next_instruction MOVE_REG_TO_REG
+  DEBUG   machine:execute_next_instruction tick=15     ip=0x41    ar=0x0     dr=0x0     a0=0x77f   a1=0x0     a2=0x0     a3=0x0     r0=0x0     r1=0x0     r2=0x0     r3=0x0     sp=0x77f   fl=0x0     stack_top=0x0
+  DEBUG   machine:execute_next_instruction MOVE_NUM_TO_MEM
+  DEBUG   machine:execute_next_instruction tick=23     ip=0x44    ar=0x77f   dr=0x80    a0=0x77f   a1=0x0     a2=0x0     a3=0x0     r0=0x0     r1=0x0     r2=0x0     r3=0x0     sp=0x77f   fl=0x0     stack_top=0x80
+  DEBUG   machine:execute_next_instruction CALL
+  DEBUG   machine:execute_next_instruction tick=29     ip=0x2     ar=0x77e   dr=0x46    a0=0x77f   a1=0x0     a2=0x0     a3=0x0     r0=0x0     r1=0x0     r2=0x0     r3=0x0     sp=0x77e   fl=0x0     stack_top=0x46
+  DEBUG   machine:execute_next_instruction MOVE_MEM_TO_REG
+  DEBUG   machine:execute_next_instruction tick=37     ip=0x5     ar=0x77f   dr=0x80    a0=0x77f   a1=0x0     a2=0x0     a3=0x0     r0=0x80    r1=0x0     r2=0x0     r3=0x0     sp=0x77e   fl=0x0     stack_top=0x46
+  DEBUG   machine:execute_next_instruction MOVE_REG_OP_NUM_TO_REG
+  DEBUG   machine:execute_next_instruction tick=47     ip=0xa     ar=0x77f   dr=0x80    a0=0x77f   a1=0x0     a2=0x0     a3=0x0     r0=0x80    r1=0x780   r2=0x0     r3=0x0     sp=0x77e   fl=0x0     stack_top=0x46
+  DEBUG   machine:execute_next_instruction MOVE_NUM_TO_REG
+  DEBUG   machine:execute_next_instruction tick=53     ip=0xd     ar=0x77f   dr=0x80    a0=0x77f   a1=0x0     a2=0x0     a3=0x0     r0=0x80    r1=0x780   r2=0x0     r3=0x0     sp=0x77e   fl=0x0     stack_top=0x46
+  DEBUG   machine:execute_next_instruction COMPARE
+  DEBUG   machine:execute_next_instruction tick=59     ip=0x10    ar=0x77f   dr=0x80    a0=0x77f   a1=0x0     a2=0x0     a3=0x0     r0=0x80    r1=0x780   r2=0x0     r3=0x0     sp=0x77e   fl=0x0     stack_top=0x46
+  DEBUG   machine:execute_next_instruction JUMP_EQUAL
+  DEBUG   machine:execute_next_instruction tick=62     ip=0x12    ar=0x77f   dr=0x80    a0=0x77f   a1=0x0     a2=0x0     a3=0x0     r0=0x80    r1=0x780   r2=0x0     r3=0x0     sp=0x77e   fl=0x0     stack_top=0x46
+  DEBUG   machine:execute_next_instruction MOVE_MEM_TO_REG
+  DEBUG   machine:signal_read_memory input: 'E' <- 'gor\n'
+  DEBUG   machine:execute_next_instruction tick=70     ip=0x15    ar=0x3e8   dr=0x45    a0=0x77f   a1=0x45    a2=0x0     a3=0x0     r0=0x80    r1=0x780   r2=0x0     r3=0x0     sp=0x77e   fl=0x0     stack_top=0x46
+  DEBUG   machine:execute_next_instruction COMPARE
+  DEBUG   machine:execute_next_instruction tick=76     ip=0x18    ar=0x3e8   dr=0x45    a0=0x77f   a1=0x45    a2=0x0     a3=0x0     r0=0x80    r1=0x780   r2=0x0     r3=0x0     sp=0x77e   fl=0x1     stack_top=0x46
+  DEBUG   machine:execute_next_instruction JUMP_EQUAL
+  DEBUG   machine:execute_next_instruction tick=79     ip=0x1a    ar=0x3e8   dr=0x45    a0=0x77f   a1=0x45    a2=0x0     a3=0x0     r0=0x80    r1=0x780   r2=0x0     r3=0x0     sp=0x77e   fl=0x1     stack_top=0x46
+  DEBUG   machine:execute_next_instruction MOVE_REG_TO_MEM
+  DEBUG   machine:execute_next_instruction tick=87     ip=0x1d    ar=0x780   dr=0x45    a0=0x77f   a1=0x45    a2=0x0     a3=0x0     r0=0x80    r1=0x780   r2=0x0     r3=0x0     sp=0x77e   fl=0x1     stack_top=0x46
+  DEBUG   machine:execute_next_instruction DECREMENT
+  DEBUG   machine:execute_next_instruction tick=91     ip=0x1f    ar=0x780   dr=0x45    a0=0x77f   a1=0x45    a2=0x0     a3=0x0     r0=0x7f    r1=0x780   r2=0x0     r3=0x0     sp=0x77e   fl=0x1     stack_top=0x46
+  DEBUG   machine:execute_next_instruction INCREMENT
+  DEBUG   machine:execute_next_instruction tick=95     ip=0x21    ar=0x780   dr=0x45    a0=0x77f   a1=0x45    a2=0x0     a3=0x0     r0=0x7f    r1=0x781   r2=0x0     r3=0x0     sp=0x77e   fl=0x1     stack_top=0x46
+  DEBUG   machine:execute_next_instruction INCREMENT
+  DEBUG   machine:execute_next_instruction tick=99     ip=0x23    ar=0x780   dr=0x45    a0=0x77f   a1=0x45    a2=0x0     a3=0x0     r0=0x7f    r1=0x781   r2=0x1     r3=0x0     sp=0x77e   fl=0x1     stack_top=0x46
+  DEBUG   machine:execute_next_instruction JUMP
+  DEBUG   machine:execute_next_instruction tick=102    ip=0xd     ar=0x780   dr=0x45    a0=0x77f   a1=0x45    a2=0x0     a3=0x0     r0=0x7f    r1=0x781   r2=0x1     r3=0x0     sp=0x77e   fl=0x1     stack_top=0x46
+  DEBUG   machine:execute_next_instruction COMPARE
+  DEBUG   machine:execute_next_instruction tick=108    ip=0x10    ar=0x780   dr=0x45    a0=0x77f   a1=0x45    a2=0x0     a3=0x0     r0=0x7f    r1=0x781   r2=0x1     r3=0x0     sp=0x77e   fl=0x0     stack_top=0x46
+  DEBUG   machine:execute_next_instruction JUMP_EQUAL
+  DEBUG   machine:execute_next_instruction tick=111    ip=0x12    ar=0x780   dr=0x45    a0=0x77f   a1=0x45    a2=0x0     a3=0x0     r0=0x7f    r1=0x781   r2=0x1     r3=0x0     sp=0x77e   fl=0x0     stack_top=0x46
+  DEBUG   machine:execute_next_instruction MOVE_MEM_TO_REG
+  DEBUG   machine:signal_read_memory input: 'g' <- 'or\n'
+  DEBUG   machine:execute_next_instruction tick=119    ip=0x15    ar=0x3e8   dr=0x67    a0=0x77f   a1=0x67    a2=0x0     a3=0x0     r0=0x7f    r1=0x781   r2=0x1     r3=0x0     sp=0x77e   fl=0x0     stack_top=0x46
+  DEBUG   machine:execute_next_instruction COMPARE
+  DEBUG   machine:execute_next_instruction tick=125    ip=0x18    ar=0x3e8   dr=0x67    a0=0x77f   a1=0x67    a2=0x0     a3=0x0     r0=0x7f    r1=0x781   r2=0x1     r3=0x0     sp=0x77e   fl=0x1     stack_top=0x46
+  DEBUG   machine:execute_next_instruction JUMP_EQUAL
+  DEBUG   machine:execute_next_instruction tick=128    ip=0x1a    ar=0x3e8   dr=0x67    a0=0x77f   a1=0x67    a2=0x0     a3=0x0     r0=0x7f    r1=0x781   r2=0x1     r3=0x0     sp=0x77e   fl=0x1     stack_top=0x46
+  DEBUG   machine:execute_next_instruction MOVE_REG_TO_MEM
+  DEBUG   machine:execute_next_instruction tick=136    ip=0x1d    ar=0x781   dr=0x67    a0=0x77f   a1=0x67    a2=0x0     a3=0x0     r0=0x7f    r1=0x781   r2=0x1     r3=0x0     sp=0x77e   fl=0x1     stack_top=0x46
+  DEBUG   machine:execute_next_instruction DECREMENT
+  DEBUG   machine:execute_next_instruction tick=140    ip=0x1f    ar=0x781   dr=0x67    a0=0x77f   a1=0x67    a2=0x0     a3=0x0     r0=0x7e    r1=0x781   r2=0x1     r3=0x0     sp=0x77e   fl=0x1     stack_top=0x46
+  DEBUG   machine:execute_next_instruction INCREMENT
+  DEBUG   machine:execute_next_instruction tick=144    ip=0x21    ar=0x781   dr=0x67    a0=0x77f   a1=0x67    a2=0x0     a3=0x0     r0=0x7e    r1=0x782   r2=0x1     r3=0x0     sp=0x77e   fl=0x1     stack_top=0x46
+  DEBUG   machine:execute_next_instruction INCREMENT
+  DEBUG   machine:execute_next_instruction tick=148    ip=0x23    ar=0x781   dr=0x67    a0=0x77f   a1=0x67    a2=0x0     a3=0x0     r0=0x7e    r1=0x782   r2=0x2     r3=0x0     sp=0x77e   fl=0x1     stack_top=0x46
+  DEBUG   machine:execute_next_instruction JUMP
+  DEBUG   machine:execute_next_instruction tick=151    ip=0xd     ar=0x781   dr=0x67    a0=0x77f   a1=0x67    a2=0x0     a3=0x0     r0=0x7e    r1=0x782   r2=0x2     r3=0x0     sp=0x77e   fl=0x1     stack_top=0x46
+  DEBUG   machine:execute_next_instruction COMPARE
+  DEBUG   machine:execute_next_instruction tick=157    ip=0x10    ar=0x781   dr=0x67    a0=0x77f   a1=0x67    a2=0x0     a3=0x0     r0=0x7e    r1=0x782   r2=0x2     r3=0x0     sp=0x77e   fl=0x0     stack_top=0x46
+  DEBUG   machine:execute_next_instruction JUMP_EQUAL
+  DEBUG   machine:execute_next_instruction tick=160    ip=0x12    ar=0x781   dr=0x67    a0=0x77f   a1=0x67    a2=0x0     a3=0x0     r0=0x7e    r1=0x782   r2=0x2     r3=0x0     sp=0x77e   fl=0x0     stack_top=0x46
+  DEBUG   machine:execute_next_instruction MOVE_MEM_TO_REG
+  DEBUG   machine:signal_read_memory input: 'o' <- 'r\n'
+  DEBUG   machine:execute_next_instruction tick=168    ip=0x15    ar=0x3e8   dr=0x6f    a0=0x77f   a1=0x6f    a2=0x0     a3=0x0     r0=0x7e    r1=0x782   r2=0x2     r3=0x0     sp=0x77e   fl=0x0     stack_top=0x46
+  DEBUG   machine:execute_next_instruction COMPARE
+  DEBUG   machine:execute_next_instruction tick=174    ip=0x18    ar=0x3e8   dr=0x6f    a0=0x77f   a1=0x6f    a2=0x0     a3=0x0     r0=0x7e    r1=0x782   r2=0x2     r3=0x0     sp=0x77e   fl=0x1     stack_top=0x46
+  DEBUG   machine:execute_next_instruction JUMP_EQUAL
+  DEBUG   machine:execute_next_instruction tick=177    ip=0x1a    ar=0x3e8   dr=0x6f    a0=0x77f   a1=0x6f    a2=0x0     a3=0x0     r0=0x7e    r1=0x782   r2=0x2     r3=0x0     sp=0x77e   fl=0x1     stack_top=0x46
+  DEBUG   machine:execute_next_instruction MOVE_REG_TO_MEM
+  DEBUG   machine:execute_next_instruction tick=185    ip=0x1d    ar=0x782   dr=0x6f    a0=0x77f   a1=0x6f    a2=0x0     a3=0x0     r0=0x7e    r1=0x782   r2=0x2     r3=0x0     sp=0x77e   fl=0x1     stack_top=0x46
+  DEBUG   machine:execute_next_instruction DECREMENT
+  DEBUG   machine:execute_next_instruction tick=189    ip=0x1f    ar=0x782   dr=0x6f    a0=0x77f   a1=0x6f    a2=0x0     a3=0x0     r0=0x7d    r1=0x782   r2=0x2     r3=0x0     sp=0x77e   fl=0x1     stack_top=0x46
+  DEBUG   machine:execute_next_instruction INCREMENT
+  DEBUG   machine:execute_next_instruction tick=193    ip=0x21    ar=0x782   dr=0x6f    a0=0x77f   a1=0x6f    a2=0x0     a3=0x0     r0=0x7d    r1=0x783   r2=0x2     r3=0x0     sp=0x77e   fl=0x1     stack_top=0x46
+  DEBUG   machine:execute_next_instruction INCREMENT
+  DEBUG   machine:execute_next_instruction tick=197    ip=0x23    ar=0x782   dr=0x6f    a0=0x77f   a1=0x6f    a2=0x0     a3=0x0     r0=0x7d    r1=0x783   r2=0x3     r3=0x0     sp=0x77e   fl=0x1     stack_top=0x46
+  DEBUG   machine:execute_next_instruction JUMP
+  DEBUG   machine:execute_next_instruction tick=200    ip=0xd     ar=0x782   dr=0x6f    a0=0x77f   a1=0x6f    a2=0x0     a3=0x0     r0=0x7d    r1=0x783   r2=0x3     r3=0x0     sp=0x77e   fl=0x1     stack_top=0x46
+  DEBUG   machine:execute_next_instruction COMPARE
+  DEBUG   machine:execute_next_instruction tick=206    ip=0x10    ar=0x782   dr=0x6f    a0=0x77f   a1=0x6f    a2=0x0     a3=0x0     r0=0x7d    r1=0x783   r2=0x3     r3=0x0     sp=0x77e   fl=0x0     stack_top=0x46
+  DEBUG   machine:execute_next_instruction JUMP_EQUAL
+  DEBUG   machine:execute_next_instruction tick=209    ip=0x12    ar=0x782   dr=0x6f    a0=0x77f   a1=0x6f    a2=0x0     a3=0x0     r0=0x7d    r1=0x783   r2=0x3     r3=0x0     sp=0x77e   fl=0x0     stack_top=0x46
+  DEBUG   machine:execute_next_instruction MOVE_MEM_TO_REG
+  DEBUG   machine:signal_read_memory input: 'r' <- '\n'
+  DEBUG   machine:execute_next_instruction tick=217    ip=0x15    ar=0x3e8   dr=0x72    a0=0x77f   a1=0x72    a2=0x0     a3=0x0     r0=0x7d    r1=0x783   r2=0x3     r3=0x0     sp=0x77e   fl=0x0     stack_top=0x46
+  DEBUG   machine:execute_next_instruction COMPARE
+  DEBUG   machine:execute_next_instruction tick=223    ip=0x18    ar=0x3e8   dr=0x72    a0=0x77f   a1=0x72    a2=0x0     a3=0x0     r0=0x7d    r1=0x783   r2=0x3     r3=0x0     sp=0x77e   fl=0x1     stack_top=0x46
+  DEBUG   machine:execute_next_instruction JUMP_EQUAL
+  DEBUG   machine:execute_next_instruction tick=226    ip=0x1a    ar=0x3e8   dr=0x72    a0=0x77f   a1=0x72    a2=0x0     a3=0x0     r0=0x7d    r1=0x783   r2=0x3     r3=0x0     sp=0x77e   fl=0x1     stack_top=0x46
+  DEBUG   machine:execute_next_instruction MOVE_REG_TO_MEM
+  DEBUG   machine:execute_next_instruction tick=234    ip=0x1d    ar=0x783   dr=0x72    a0=0x77f   a1=0x72    a2=0x0     a3=0x0     r0=0x7d    r1=0x783   r2=0x3     r3=0x0     sp=0x77e   fl=0x1     stack_top=0x46
+  DEBUG   machine:execute_next_instruction DECREMENT
+  DEBUG   machine:execute_next_instruction tick=238    ip=0x1f    ar=0x783   dr=0x72    a0=0x77f   a1=0x72    a2=0x0     a3=0x0     r0=0x7c    r1=0x783   r2=0x3     r3=0x0     sp=0x77e   fl=0x1     stack_top=0x46
+  DEBUG   machine:execute_next_instruction INCREMENT
+  DEBUG   machine:execute_next_instruction tick=242    ip=0x21    ar=0x783   dr=0x72    a0=0x77f   a1=0x72    a2=0x0     a3=0x0     r0=0x7c    r1=0x784   r2=0x3     r3=0x0     sp=0x77e   fl=0x1     stack_top=0x46
+  DEBUG   machine:execute_next_instruction INCREMENT
+  DEBUG   machine:execute_next_instruction tick=246    ip=0x23    ar=0x783   dr=0x72    a0=0x77f   a1=0x72    a2=0x0     a3=0x0     r0=0x7c    r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x1     stack_top=0x46
+  DEBUG   machine:execute_next_instruction JUMP
+  DEBUG   machine:execute_next_instruction tick=249    ip=0xd     ar=0x783   dr=0x72    a0=0x77f   a1=0x72    a2=0x0     a3=0x0     r0=0x7c    r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x1     stack_top=0x46
+  DEBUG   machine:execute_next_instruction COMPARE
+  DEBUG   machine:execute_next_instruction tick=255    ip=0x10    ar=0x783   dr=0x72    a0=0x77f   a1=0x72    a2=0x0     a3=0x0     r0=0x7c    r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x0     stack_top=0x46
+  DEBUG   machine:execute_next_instruction JUMP_EQUAL
+  DEBUG   machine:execute_next_instruction tick=258    ip=0x12    ar=0x783   dr=0x72    a0=0x77f   a1=0x72    a2=0x0     a3=0x0     r0=0x7c    r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x0     stack_top=0x46
+  DEBUG   machine:execute_next_instruction MOVE_MEM_TO_REG
+  DEBUG   machine:signal_read_memory input: '\n' <- ''
+  DEBUG   machine:execute_next_instruction tick=266    ip=0x15    ar=0x3e8   dr=0xa     a0=0x77f   a1=0xa     a2=0x0     a3=0x0     r0=0x7c    r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x0     stack_top=0x46
+  DEBUG   machine:execute_next_instruction COMPARE
+  DEBUG   machine:execute_next_instruction tick=272    ip=0x18    ar=0x3e8   dr=0xa     a0=0x77f   a1=0xa     a2=0x0     a3=0x0     r0=0x7c    r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x5     stack_top=0x46
+  DEBUG   machine:execute_next_instruction JUMP_EQUAL
+  DEBUG   machine:execute_next_instruction tick=275    ip=0x25    ar=0x3e8   dr=0xa     a0=0x77f   a1=0xa     a2=0x0     a3=0x0     r0=0x7c    r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x5     stack_top=0x46
+  DEBUG   machine:execute_next_instruction MOVE_REG_TO_MEM
+  DEBUG   machine:execute_next_instruction tick=283    ip=0x28    ar=0x77f   dr=0x4     a0=0x77f   a1=0xa     a2=0x0     a3=0x0     r0=0x7c    r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x5     stack_top=0x46
+  DEBUG   machine:execute_next_instruction RETURN
+  DEBUG   machine:execute_next_instruction tick=287    ip=0x46    ar=0x77e   dr=0x46    a0=0x77f   a1=0xa     a2=0x0     a3=0x0     r0=0x7c    r1=0x784   r2=0x4     r3=0x0     sp=0x77f   fl=0x5     stack_top=0x4
+  DEBUG   machine:execute_next_instruction PUSH
+  DEBUG   machine:execute_next_instruction tick=293    ip=0x48    ar=0x77e   dr=0x77f   a0=0x77f   a1=0xa     a2=0x0     a3=0x0     r0=0x7c    r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x5     stack_top=0x77f
+  DEBUG   machine:execute_next_instruction MOVE_NUM_TO_REG
+  DEBUG   machine:execute_next_instruction tick=299    ip=0x4b    ar=0x77e   dr=0x77f   a0=0x5b    a1=0xa     a2=0x0     a3=0x0     r0=0x7c    r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x5     stack_top=0x77f
+  DEBUG   machine:execute_next_instruction CALL
+  DEBUG   machine:execute_next_instruction tick=305    ip=0x29    ar=0x77d   dr=0x4d    a0=0x5b    a1=0xa     a2=0x0     a3=0x0     r0=0x7c    r1=0x784   r2=0x4     r3=0x0     sp=0x77d   fl=0x5     stack_top=0x4d
+  DEBUG   machine:execute_next_instruction MOVE_MEM_TO_REG
+  DEBUG   machine:execute_next_instruction tick=313    ip=0x2c    ar=0x5b    dr=0x7     a0=0x5b    a1=0xa     a2=0x0     a3=0x0     r0=0x7     r1=0x784   r2=0x4     r3=0x0     sp=0x77d   fl=0x5     stack_top=0x4d
+  DEBUG   machine:execute_next_instruction INCREMENT
+  DEBUG   machine:execute_next_instruction tick=317    ip=0x2e    ar=0x5b    dr=0x7     a0=0x5c    a1=0xa     a2=0x0     a3=0x0     r0=0x7     r1=0x784   r2=0x4     r3=0x0     sp=0x77d   fl=0x5     stack_top=0x4d
+  DEBUG   machine:execute_next_instruction COMPARE
+  DEBUG   machine:execute_next_instruction tick=323    ip=0x31    ar=0x5b    dr=0x7     a0=0x5c    a1=0xa     a2=0x0     a3=0x0     r0=0x7     r1=0x784   r2=0x4     r3=0x0     sp=0x77d   fl=0x0     stack_top=0x4d
+  DEBUG   machine:execute_next_instruction JUMP_EQUAL
+  DEBUG   machine:execute_next_instruction tick=326    ip=0x33    ar=0x5b    dr=0x7     a0=0x5c    a1=0xa     a2=0x0     a3=0x0     r0=0x7     r1=0x784   r2=0x4     r3=0x0     sp=0x77d   fl=0x0     stack_top=0x4d
+  DEBUG   machine:execute_next_instruction MOVE_MEM_TO_MEM
+  DEBUG   machine:signal_write_memory output: '' <- 'H'
+  DEBUG   machine:execute_next_instruction tick=335    ip=0x36    ar=0x3e9   dr=0x48    a0=0x5c    a1=0xa     a2=0x0     a3=0x0     r0=0x7     r1=0x784   r2=0x4     r3=0x0     sp=0x77d   fl=0x0     stack_top=0x4d
+  DEBUG   machine:execute_next_instruction DECREMENT
+  DEBUG   machine:execute_next_instruction tick=339    ip=0x38    ar=0x3e9   dr=0x48    a0=0x5c    a1=0xa     a2=0x0     a3=0x0     r0=0x6     r1=0x784   r2=0x4     r3=0x0     sp=0x77d   fl=0x0     stack_top=0x4d
+  DEBUG   machine:execute_next_instruction JUMP
+  DEBUG   machine:execute_next_instruction tick=342    ip=0x2c    ar=0x3e9   dr=0x48    a0=0x5c    a1=0xa     a2=0x0     a3=0x0     r0=0x6     r1=0x784   r2=0x4     r3=0x0     sp=0x77d   fl=0x0     stack_top=0x4d
+  DEBUG   machine:execute_next_instruction INCREMENT
+  DEBUG   machine:execute_next_instruction tick=346    ip=0x2e    ar=0x3e9   dr=0x48    a0=0x5d    a1=0xa     a2=0x0     a3=0x0     r0=0x6     r1=0x784   r2=0x4     r3=0x0     sp=0x77d   fl=0x0     stack_top=0x4d
+  DEBUG   machine:execute_next_instruction COMPARE
+  DEBUG   machine:execute_next_instruction tick=352    ip=0x31    ar=0x3e9   dr=0x48    a0=0x5d    a1=0xa     a2=0x0     a3=0x0     r0=0x6     r1=0x784   r2=0x4     r3=0x0     sp=0x77d   fl=0x0     stack_top=0x4d
+  DEBUG   machine:execute_next_instruction JUMP_EQUAL
+  DEBUG   machine:execute_next_instruction tick=355    ip=0x33    ar=0x3e9   dr=0x48    a0=0x5d    a1=0xa     a2=0x0     a3=0x0     r0=0x6     r1=0x784   r2=0x4     r3=0x0     sp=0x77d   fl=0x0     stack_top=0x4d
+  DEBUG   machine:execute_next_instruction MOVE_MEM_TO_MEM
+  DEBUG   machine:signal_write_memory output: 'H' <- 'e'
+  DEBUG   machine:execute_next_instruction tick=364    ip=0x36    ar=0x3e9   dr=0x65    a0=0x5d    a1=0xa     a2=0x0     a3=0x0     r0=0x6     r1=0x784   r2=0x4     r3=0x0     sp=0x77d   fl=0x0     stack_top=0x4d
+  DEBUG   machine:execute_next_instruction DECREMENT
+  DEBUG   machine:execute_next_instruction tick=368    ip=0x38    ar=0x3e9   dr=0x65    a0=0x5d    a1=0xa     a2=0x0     a3=0x0     r0=0x5     r1=0x784   r2=0x4     r3=0x0     sp=0x77d   fl=0x0     stack_top=0x4d
+  DEBUG   machine:execute_next_instruction JUMP
+  DEBUG   machine:execute_next_instruction tick=371    ip=0x2c    ar=0x3e9   dr=0x65    a0=0x5d    a1=0xa     a2=0x0     a3=0x0     r0=0x5     r1=0x784   r2=0x4     r3=0x0     sp=0x77d   fl=0x0     stack_top=0x4d
+  DEBUG   machine:execute_next_instruction INCREMENT
+  DEBUG   machine:execute_next_instruction tick=375    ip=0x2e    ar=0x3e9   dr=0x65    a0=0x5e    a1=0xa     a2=0x0     a3=0x0     r0=0x5     r1=0x784   r2=0x4     r3=0x0     sp=0x77d   fl=0x0     stack_top=0x4d
+  DEBUG   machine:execute_next_instruction COMPARE
+  DEBUG   machine:execute_next_instruction tick=381    ip=0x31    ar=0x3e9   dr=0x65    a0=0x5e    a1=0xa     a2=0x0     a3=0x0     r0=0x5     r1=0x784   r2=0x4     r3=0x0     sp=0x77d   fl=0x0     stack_top=0x4d
+  DEBUG   machine:execute_next_instruction JUMP_EQUAL
+  DEBUG   machine:execute_next_instruction tick=384    ip=0x33    ar=0x3e9   dr=0x65    a0=0x5e    a1=0xa     a2=0x0     a3=0x0     r0=0x5     r1=0x784   r2=0x4     r3=0x0     sp=0x77d   fl=0x0     stack_top=0x4d
+  DEBUG   machine:execute_next_instruction MOVE_MEM_TO_MEM
+  DEBUG   machine:signal_write_memory output: 'He' <- 'l'
+  DEBUG   machine:execute_next_instruction tick=393    ip=0x36    ar=0x3e9   dr=0x6c    a0=0x5e    a1=0xa     a2=0x0     a3=0x0     r0=0x5     r1=0x784   r2=0x4     r3=0x0     sp=0x77d   fl=0x0     stack_top=0x4d
+  DEBUG   machine:execute_next_instruction DECREMENT
+  DEBUG   machine:execute_next_instruction tick=397    ip=0x38    ar=0x3e9   dr=0x6c    a0=0x5e    a1=0xa     a2=0x0     a3=0x0     r0=0x4     r1=0x784   r2=0x4     r3=0x0     sp=0x77d   fl=0x0     stack_top=0x4d
+  DEBUG   machine:execute_next_instruction JUMP
+  DEBUG   machine:execute_next_instruction tick=400    ip=0x2c    ar=0x3e9   dr=0x6c    a0=0x5e    a1=0xa     a2=0x0     a3=0x0     r0=0x4     r1=0x784   r2=0x4     r3=0x0     sp=0x77d   fl=0x0     stack_top=0x4d
+  DEBUG   machine:execute_next_instruction INCREMENT
+  DEBUG   machine:execute_next_instruction tick=404    ip=0x2e    ar=0x3e9   dr=0x6c    a0=0x5f    a1=0xa     a2=0x0     a3=0x0     r0=0x4     r1=0x784   r2=0x4     r3=0x0     sp=0x77d   fl=0x0     stack_top=0x4d
+  DEBUG   machine:execute_next_instruction COMPARE
+  DEBUG   machine:execute_next_instruction tick=410    ip=0x31    ar=0x3e9   dr=0x6c    a0=0x5f    a1=0xa     a2=0x0     a3=0x0     r0=0x4     r1=0x784   r2=0x4     r3=0x0     sp=0x77d   fl=0x0     stack_top=0x4d
+  DEBUG   machine:execute_next_instruction JUMP_EQUAL
+  DEBUG   machine:execute_next_instruction tick=413    ip=0x33    ar=0x3e9   dr=0x6c    a0=0x5f    a1=0xa     a2=0x0     a3=0x0     r0=0x4     r1=0x784   r2=0x4     r3=0x0     sp=0x77d   fl=0x0     stack_top=0x4d
+  DEBUG   machine:execute_next_instruction MOVE_MEM_TO_MEM
+  DEBUG   machine:signal_write_memory output: 'Hel' <- 'l'
+  DEBUG   machine:execute_next_instruction tick=422    ip=0x36    ar=0x3e9   dr=0x6c    a0=0x5f    a1=0xa     a2=0x0     a3=0x0     r0=0x4     r1=0x784   r2=0x4     r3=0x0     sp=0x77d   fl=0x0     stack_top=0x4d
+  DEBUG   machine:execute_next_instruction DECREMENT
+  DEBUG   machine:execute_next_instruction tick=426    ip=0x38    ar=0x3e9   dr=0x6c    a0=0x5f    a1=0xa     a2=0x0     a3=0x0     r0=0x3     r1=0x784   r2=0x4     r3=0x0     sp=0x77d   fl=0x0     stack_top=0x4d
+  DEBUG   machine:execute_next_instruction JUMP
+  DEBUG   machine:execute_next_instruction tick=429    ip=0x2c    ar=0x3e9   dr=0x6c    a0=0x5f    a1=0xa     a2=0x0     a3=0x0     r0=0x3     r1=0x784   r2=0x4     r3=0x0     sp=0x77d   fl=0x0     stack_top=0x4d
+  DEBUG   machine:execute_next_instruction INCREMENT
+  DEBUG   machine:execute_next_instruction tick=433    ip=0x2e    ar=0x3e9   dr=0x6c    a0=0x60    a1=0xa     a2=0x0     a3=0x0     r0=0x3     r1=0x784   r2=0x4     r3=0x0     sp=0x77d   fl=0x0     stack_top=0x4d
+  DEBUG   machine:execute_next_instruction COMPARE
+  DEBUG   machine:execute_next_instruction tick=439    ip=0x31    ar=0x3e9   dr=0x6c    a0=0x60    a1=0xa     a2=0x0     a3=0x0     r0=0x3     r1=0x784   r2=0x4     r3=0x0     sp=0x77d   fl=0x0     stack_top=0x4d
+  DEBUG   machine:execute_next_instruction JUMP_EQUAL
+  DEBUG   machine:execute_next_instruction tick=442    ip=0x33    ar=0x3e9   dr=0x6c    a0=0x60    a1=0xa     a2=0x0     a3=0x0     r0=0x3     r1=0x784   r2=0x4     r3=0x0     sp=0x77d   fl=0x0     stack_top=0x4d
+  DEBUG   machine:execute_next_instruction MOVE_MEM_TO_MEM
+  DEBUG   machine:signal_write_memory output: 'Hell' <- 'o'
+  DEBUG   machine:execute_next_instruction tick=451    ip=0x36    ar=0x3e9   dr=0x6f    a0=0x60    a1=0xa     a2=0x0     a3=0x0     r0=0x3     r1=0x784   r2=0x4     r3=0x0     sp=0x77d   fl=0x0     stack_top=0x4d
+  DEBUG   machine:execute_next_instruction DECREMENT
+  DEBUG   machine:execute_next_instruction tick=455    ip=0x38    ar=0x3e9   dr=0x6f    a0=0x60    a1=0xa     a2=0x0     a3=0x0     r0=0x2     r1=0x784   r2=0x4     r3=0x0     sp=0x77d   fl=0x0     stack_top=0x4d
+  DEBUG   machine:execute_next_instruction JUMP
+  DEBUG   machine:execute_next_instruction tick=458    ip=0x2c    ar=0x3e9   dr=0x6f    a0=0x60    a1=0xa     a2=0x0     a3=0x0     r0=0x2     r1=0x784   r2=0x4     r3=0x0     sp=0x77d   fl=0x0     stack_top=0x4d
+  DEBUG   machine:execute_next_instruction INCREMENT
+  DEBUG   machine:execute_next_instruction tick=462    ip=0x2e    ar=0x3e9   dr=0x6f    a0=0x61    a1=0xa     a2=0x0     a3=0x0     r0=0x2     r1=0x784   r2=0x4     r3=0x0     sp=0x77d   fl=0x0     stack_top=0x4d
+  DEBUG   machine:execute_next_instruction COMPARE
+  DEBUG   machine:execute_next_instruction tick=468    ip=0x31    ar=0x3e9   dr=0x6f    a0=0x61    a1=0xa     a2=0x0     a3=0x0     r0=0x2     r1=0x784   r2=0x4     r3=0x0     sp=0x77d   fl=0x0     stack_top=0x4d
+  DEBUG   machine:execute_next_instruction JUMP_EQUAL
+  DEBUG   machine:execute_next_instruction tick=471    ip=0x33    ar=0x3e9   dr=0x6f    a0=0x61    a1=0xa     a2=0x0     a3=0x0     r0=0x2     r1=0x784   r2=0x4     r3=0x0     sp=0x77d   fl=0x0     stack_top=0x4d
+  DEBUG   machine:execute_next_instruction MOVE_MEM_TO_MEM
+  DEBUG   machine:signal_write_memory output: 'Hello' <- ','
+  DEBUG   machine:execute_next_instruction tick=480    ip=0x36    ar=0x3e9   dr=0x2c    a0=0x61    a1=0xa     a2=0x0     a3=0x0     r0=0x2     r1=0x784   r2=0x4     r3=0x0     sp=0x77d   fl=0x0     stack_top=0x4d
+  DEBUG   machine:execute_next_instruction DECREMENT
+  DEBUG   machine:execute_next_instruction tick=484    ip=0x38    ar=0x3e9   dr=0x2c    a0=0x61    a1=0xa     a2=0x0     a3=0x0     r0=0x1     r1=0x784   r2=0x4     r3=0x0     sp=0x77d   fl=0x0     stack_top=0x4d
+  DEBUG   machine:execute_next_instruction JUMP
+  DEBUG   machine:execute_next_instruction tick=487    ip=0x2c    ar=0x3e9   dr=0x2c    a0=0x61    a1=0xa     a2=0x0     a3=0x0     r0=0x1     r1=0x784   r2=0x4     r3=0x0     sp=0x77d   fl=0x0     stack_top=0x4d
+  DEBUG   machine:execute_next_instruction INCREMENT
+  DEBUG   machine:execute_next_instruction tick=491    ip=0x2e    ar=0x3e9   dr=0x2c    a0=0x62    a1=0xa     a2=0x0     a3=0x0     r0=0x1     r1=0x784   r2=0x4     r3=0x0     sp=0x77d   fl=0x0     stack_top=0x4d
+  DEBUG   machine:execute_next_instruction COMPARE
+  DEBUG   machine:execute_next_instruction tick=497    ip=0x31    ar=0x3e9   dr=0x2c    a0=0x62    a1=0xa     a2=0x0     a3=0x0     r0=0x1     r1=0x784   r2=0x4     r3=0x0     sp=0x77d   fl=0x0     stack_top=0x4d
+  DEBUG   machine:execute_next_instruction JUMP_EQUAL
+  DEBUG   machine:execute_next_instruction tick=500    ip=0x33    ar=0x3e9   dr=0x2c    a0=0x62    a1=0xa     a2=0x0     a3=0x0     r0=0x1     r1=0x784   r2=0x4     r3=0x0     sp=0x77d   fl=0x0     stack_top=0x4d
+  DEBUG   machine:execute_next_instruction MOVE_MEM_TO_MEM
+  DEBUG   machine:signal_write_memory output: 'Hello,' <- ' '
+  DEBUG   machine:execute_next_instruction tick=509    ip=0x36    ar=0x3e9   dr=0x20    a0=0x62    a1=0xa     a2=0x0     a3=0x0     r0=0x1     r1=0x784   r2=0x4     r3=0x0     sp=0x77d   fl=0x0     stack_top=0x4d
+  DEBUG   machine:execute_next_instruction DECREMENT
+  DEBUG   machine:execute_next_instruction tick=513    ip=0x38    ar=0x3e9   dr=0x20    a0=0x62    a1=0xa     a2=0x0     a3=0x0     r0=0x0     r1=0x784   r2=0x4     r3=0x0     sp=0x77d   fl=0x0     stack_top=0x4d
+  DEBUG   machine:execute_next_instruction JUMP
+  DEBUG   machine:execute_next_instruction tick=516    ip=0x2c    ar=0x3e9   dr=0x20    a0=0x62    a1=0xa     a2=0x0     a3=0x0     r0=0x0     r1=0x784   r2=0x4     r3=0x0     sp=0x77d   fl=0x0     stack_top=0x4d
+  DEBUG   machine:execute_next_instruction INCREMENT
+  DEBUG   machine:execute_next_instruction tick=520    ip=0x2e    ar=0x3e9   dr=0x20    a0=0x63    a1=0xa     a2=0x0     a3=0x0     r0=0x0     r1=0x784   r2=0x4     r3=0x0     sp=0x77d   fl=0x0     stack_top=0x4d
+  DEBUG   machine:execute_next_instruction COMPARE
+  DEBUG   machine:execute_next_instruction tick=526    ip=0x31    ar=0x3e9   dr=0x20    a0=0x63    a1=0xa     a2=0x0     a3=0x0     r0=0x0     r1=0x784   r2=0x4     r3=0x0     sp=0x77d   fl=0x4     stack_top=0x4d
+  DEBUG   machine:execute_next_instruction JUMP_EQUAL
+  DEBUG   machine:execute_next_instruction tick=529    ip=0x3a    ar=0x3e9   dr=0x20    a0=0x63    a1=0xa     a2=0x0     a3=0x0     r0=0x0     r1=0x784   r2=0x4     r3=0x0     sp=0x77d   fl=0x4     stack_top=0x4d
+  DEBUG   machine:execute_next_instruction RETURN
+  DEBUG   machine:execute_next_instruction tick=533    ip=0x4d    ar=0x77d   dr=0x4d    a0=0x63    a1=0xa     a2=0x0     a3=0x0     r0=0x0     r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x4     stack_top=0x77f
+  DEBUG   machine:execute_next_instruction POP
+  DEBUG   machine:execute_next_instruction tick=540    ip=0x4f    ar=0x77e   dr=0x77f   a0=0x77f   a1=0xa     a2=0x0     a3=0x0     r0=0x0     r1=0x784   r2=0x4     r3=0x0     sp=0x77f   fl=0x4     stack_top=0x4
+  DEBUG   machine:execute_next_instruction CALL
+  DEBUG   machine:execute_next_instruction tick=546    ip=0x29    ar=0x77e   dr=0x51    a0=0x77f   a1=0xa     a2=0x0     a3=0x0     r0=0x0     r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x4     stack_top=0x51
+  DEBUG   machine:execute_next_instruction MOVE_MEM_TO_REG
+  DEBUG   machine:execute_next_instruction tick=554    ip=0x2c    ar=0x77f   dr=0x4     a0=0x77f   a1=0xa     a2=0x0     a3=0x0     r0=0x4     r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x4     stack_top=0x51
+  DEBUG   machine:execute_next_instruction INCREMENT
+  DEBUG   machine:execute_next_instruction tick=558    ip=0x2e    ar=0x77f   dr=0x4     a0=0x780   a1=0xa     a2=0x0     a3=0x0     r0=0x4     r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x4     stack_top=0x51
+  DEBUG   machine:execute_next_instruction COMPARE
+  DEBUG   machine:execute_next_instruction tick=564    ip=0x31    ar=0x77f   dr=0x4     a0=0x780   a1=0xa     a2=0x0     a3=0x0     r0=0x4     r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x0     stack_top=0x51
+  DEBUG   machine:execute_next_instruction JUMP_EQUAL
+  DEBUG   machine:execute_next_instruction tick=567    ip=0x33    ar=0x77f   dr=0x4     a0=0x780   a1=0xa     a2=0x0     a3=0x0     r0=0x4     r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x0     stack_top=0x51
+  DEBUG   machine:execute_next_instruction MOVE_MEM_TO_MEM
+  DEBUG   machine:signal_write_memory output: 'Hello, ' <- 'E'
+  DEBUG   machine:execute_next_instruction tick=576    ip=0x36    ar=0x3e9   dr=0x45    a0=0x780   a1=0xa     a2=0x0     a3=0x0     r0=0x4     r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x0     stack_top=0x51
+  DEBUG   machine:execute_next_instruction DECREMENT
+  DEBUG   machine:execute_next_instruction tick=580    ip=0x38    ar=0x3e9   dr=0x45    a0=0x780   a1=0xa     a2=0x0     a3=0x0     r0=0x3     r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x0     stack_top=0x51
+  DEBUG   machine:execute_next_instruction JUMP
+  DEBUG   machine:execute_next_instruction tick=583    ip=0x2c    ar=0x3e9   dr=0x45    a0=0x780   a1=0xa     a2=0x0     a3=0x0     r0=0x3     r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x0     stack_top=0x51
+  DEBUG   machine:execute_next_instruction INCREMENT
+  DEBUG   machine:execute_next_instruction tick=587    ip=0x2e    ar=0x3e9   dr=0x45    a0=0x781   a1=0xa     a2=0x0     a3=0x0     r0=0x3     r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x0     stack_top=0x51
+  DEBUG   machine:execute_next_instruction COMPARE
+  DEBUG   machine:execute_next_instruction tick=593    ip=0x31    ar=0x3e9   dr=0x45    a0=0x781   a1=0xa     a2=0x0     a3=0x0     r0=0x3     r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x0     stack_top=0x51
+  DEBUG   machine:execute_next_instruction JUMP_EQUAL
+  DEBUG   machine:execute_next_instruction tick=596    ip=0x33    ar=0x3e9   dr=0x45    a0=0x781   a1=0xa     a2=0x0     a3=0x0     r0=0x3     r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x0     stack_top=0x51
+  DEBUG   machine:execute_next_instruction MOVE_MEM_TO_MEM
+  DEBUG   machine:signal_write_memory output: 'Hello, E' <- 'g'
+  DEBUG   machine:execute_next_instruction tick=605    ip=0x36    ar=0x3e9   dr=0x67    a0=0x781   a1=0xa     a2=0x0     a3=0x0     r0=0x3     r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x0     stack_top=0x51
+  DEBUG   machine:execute_next_instruction DECREMENT
+  DEBUG   machine:execute_next_instruction tick=609    ip=0x38    ar=0x3e9   dr=0x67    a0=0x781   a1=0xa     a2=0x0     a3=0x0     r0=0x2     r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x0     stack_top=0x51
+  DEBUG   machine:execute_next_instruction JUMP
+  DEBUG   machine:execute_next_instruction tick=612    ip=0x2c    ar=0x3e9   dr=0x67    a0=0x781   a1=0xa     a2=0x0     a3=0x0     r0=0x2     r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x0     stack_top=0x51
+  DEBUG   machine:execute_next_instruction INCREMENT
+  DEBUG   machine:execute_next_instruction tick=616    ip=0x2e    ar=0x3e9   dr=0x67    a0=0x782   a1=0xa     a2=0x0     a3=0x0     r0=0x2     r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x0     stack_top=0x51
+  DEBUG   machine:execute_next_instruction COMPARE
+  DEBUG   machine:execute_next_instruction tick=622    ip=0x31    ar=0x3e9   dr=0x67    a0=0x782   a1=0xa     a2=0x0     a3=0x0     r0=0x2     r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x0     stack_top=0x51
+  DEBUG   machine:execute_next_instruction JUMP_EQUAL
+  DEBUG   machine:execute_next_instruction tick=625    ip=0x33    ar=0x3e9   dr=0x67    a0=0x782   a1=0xa     a2=0x0     a3=0x0     r0=0x2     r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x0     stack_top=0x51
+  DEBUG   machine:execute_next_instruction MOVE_MEM_TO_MEM
+  DEBUG   machine:signal_write_memory output: 'Hello, Eg' <- 'o'
+  DEBUG   machine:execute_next_instruction tick=634    ip=0x36    ar=0x3e9   dr=0x6f    a0=0x782   a1=0xa     a2=0x0     a3=0x0     r0=0x2     r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x0     stack_top=0x51
+  DEBUG   machine:execute_next_instruction DECREMENT
+  DEBUG   machine:execute_next_instruction tick=638    ip=0x38    ar=0x3e9   dr=0x6f    a0=0x782   a1=0xa     a2=0x0     a3=0x0     r0=0x1     r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x0     stack_top=0x51
+  DEBUG   machine:execute_next_instruction JUMP
+  DEBUG   machine:execute_next_instruction tick=641    ip=0x2c    ar=0x3e9   dr=0x6f    a0=0x782   a1=0xa     a2=0x0     a3=0x0     r0=0x1     r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x0     stack_top=0x51
+  DEBUG   machine:execute_next_instruction INCREMENT
+  DEBUG   machine:execute_next_instruction tick=645    ip=0x2e    ar=0x3e9   dr=0x6f    a0=0x783   a1=0xa     a2=0x0     a3=0x0     r0=0x1     r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x0     stack_top=0x51
+  DEBUG   machine:execute_next_instruction COMPARE
+  DEBUG   machine:execute_next_instruction tick=651    ip=0x31    ar=0x3e9   dr=0x6f    a0=0x783   a1=0xa     a2=0x0     a3=0x0     r0=0x1     r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x0     stack_top=0x51
+  DEBUG   machine:execute_next_instruction JUMP_EQUAL
+  DEBUG   machine:execute_next_instruction tick=654    ip=0x33    ar=0x3e9   dr=0x6f    a0=0x783   a1=0xa     a2=0x0     a3=0x0     r0=0x1     r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x0     stack_top=0x51
+  DEBUG   machine:execute_next_instruction MOVE_MEM_TO_MEM
+  DEBUG   machine:signal_write_memory output: 'Hello, Ego' <- 'r'
+  DEBUG   machine:execute_next_instruction tick=663    ip=0x36    ar=0x3e9   dr=0x72    a0=0x783   a1=0xa     a2=0x0     a3=0x0     r0=0x1     r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x0     stack_top=0x51
+  DEBUG   machine:execute_next_instruction DECREMENT
+  DEBUG   machine:execute_next_instruction tick=667    ip=0x38    ar=0x3e9   dr=0x72    a0=0x783   a1=0xa     a2=0x0     a3=0x0     r0=0x0     r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x0     stack_top=0x51
+  DEBUG   machine:execute_next_instruction JUMP
+  DEBUG   machine:execute_next_instruction tick=670    ip=0x2c    ar=0x3e9   dr=0x72    a0=0x783   a1=0xa     a2=0x0     a3=0x0     r0=0x0     r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x0     stack_top=0x51
+  DEBUG   machine:execute_next_instruction INCREMENT
+  DEBUG   machine:execute_next_instruction tick=674    ip=0x2e    ar=0x3e9   dr=0x72    a0=0x784   a1=0xa     a2=0x0     a3=0x0     r0=0x0     r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x0     stack_top=0x51
+  DEBUG   machine:execute_next_instruction COMPARE
+  DEBUG   machine:execute_next_instruction tick=680    ip=0x31    ar=0x3e9   dr=0x72    a0=0x784   a1=0xa     a2=0x0     a3=0x0     r0=0x0     r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x4     stack_top=0x51
+  DEBUG   machine:execute_next_instruction JUMP_EQUAL
+  DEBUG   machine:execute_next_instruction tick=683    ip=0x3a    ar=0x3e9   dr=0x72    a0=0x784   a1=0xa     a2=0x0     a3=0x0     r0=0x0     r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x4     stack_top=0x51
+  DEBUG   machine:execute_next_instruction RETURN
+  DEBUG   machine:execute_next_instruction tick=687    ip=0x51    ar=0x77e   dr=0x51    a0=0x784   a1=0xa     a2=0x0     a3=0x0     r0=0x0     r1=0x784   r2=0x4     r3=0x0     sp=0x77f   fl=0x4     stack_top=0x4
+  DEBUG   machine:execute_next_instruction MOVE_NUM_TO_REG
+  DEBUG   machine:execute_next_instruction tick=693    ip=0x54    ar=0x77e   dr=0x51    a0=0x63    a1=0xa     a2=0x0     a3=0x0     r0=0x0     r1=0x784   r2=0x4     r3=0x0     sp=0x77f   fl=0x4     stack_top=0x4
+  DEBUG   machine:execute_next_instruction CALL
+  DEBUG   machine:execute_next_instruction tick=699    ip=0x29    ar=0x77e   dr=0x56    a0=0x63    a1=0xa     a2=0x0     a3=0x0     r0=0x0     r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x4     stack_top=0x56
+  DEBUG   machine:execute_next_instruction MOVE_MEM_TO_REG
+  DEBUG   machine:execute_next_instruction tick=707    ip=0x2c    ar=0x63    dr=0x1     a0=0x63    a1=0xa     a2=0x0     a3=0x0     r0=0x1     r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x4     stack_top=0x56
+  DEBUG   machine:execute_next_instruction INCREMENT
+  DEBUG   machine:execute_next_instruction tick=711    ip=0x2e    ar=0x63    dr=0x1     a0=0x64    a1=0xa     a2=0x0     a3=0x0     r0=0x1     r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x4     stack_top=0x56
+  DEBUG   machine:execute_next_instruction COMPARE
+  DEBUG   machine:execute_next_instruction tick=717    ip=0x31    ar=0x63    dr=0x1     a0=0x64    a1=0xa     a2=0x0     a3=0x0     r0=0x1     r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x0     stack_top=0x56
+  DEBUG   machine:execute_next_instruction JUMP_EQUAL
+  DEBUG   machine:execute_next_instruction tick=720    ip=0x33    ar=0x63    dr=0x1     a0=0x64    a1=0xa     a2=0x0     a3=0x0     r0=0x1     r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x0     stack_top=0x56
+  DEBUG   machine:execute_next_instruction MOVE_MEM_TO_MEM
+  DEBUG   machine:signal_write_memory output: 'Hello, Egor' <- '!'
+  DEBUG   machine:execute_next_instruction tick=729    ip=0x36    ar=0x3e9   dr=0x21    a0=0x64    a1=0xa     a2=0x0     a3=0x0     r0=0x1     r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x0     stack_top=0x56
+  DEBUG   machine:execute_next_instruction DECREMENT
+  DEBUG   machine:execute_next_instruction tick=733    ip=0x38    ar=0x3e9   dr=0x21    a0=0x64    a1=0xa     a2=0x0     a3=0x0     r0=0x0     r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x0     stack_top=0x56
+  DEBUG   machine:execute_next_instruction JUMP
+  DEBUG   machine:execute_next_instruction tick=736    ip=0x2c    ar=0x3e9   dr=0x21    a0=0x64    a1=0xa     a2=0x0     a3=0x0     r0=0x0     r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x0     stack_top=0x56
+  DEBUG   machine:execute_next_instruction INCREMENT
+  DEBUG   machine:execute_next_instruction tick=740    ip=0x2e    ar=0x3e9   dr=0x21    a0=0x65    a1=0xa     a2=0x0     a3=0x0     r0=0x0     r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x0     stack_top=0x56
+  DEBUG   machine:execute_next_instruction COMPARE
+  DEBUG   machine:execute_next_instruction tick=746    ip=0x31    ar=0x3e9   dr=0x21    a0=0x65    a1=0xa     a2=0x0     a3=0x0     r0=0x0     r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x4     stack_top=0x56
+  DEBUG   machine:execute_next_instruction JUMP_EQUAL
+  DEBUG   machine:execute_next_instruction tick=749    ip=0x3a    ar=0x3e9   dr=0x21    a0=0x65    a1=0xa     a2=0x0     a3=0x0     r0=0x0     r1=0x784   r2=0x4     r3=0x0     sp=0x77e   fl=0x4     stack_top=0x56
+  DEBUG   machine:execute_next_instruction RETURN
+  DEBUG   machine:execute_next_instruction tick=753    ip=0x56    ar=0x77e   dr=0x56    a0=0x65    a1=0xa     a2=0x0     a3=0x0     r0=0x0     r1=0x784   r2=0x4     r3=0x0     sp=0x77f   fl=0x4     stack_top=0x4
+  DEBUG   machine:execute_next_instruction ADD
+  DEBUG   machine:execute_next_instruction tick=759    ip=0x59    ar=0x77e   dr=0x56    a0=0x65    a1=0xa     a2=0x0     a3=0x0     r0=0x0     r1=0x784   r2=0x4     r3=0x0     sp=0x800   fl=0x4     stack_top=?
+  DEBUG   machine:execute_next_instruction HALT
+  INFO    machine:main          instr: 150 ticks: 759

@@ -185,7 +185,7 @@ class DataPath:
             f"sp={hex(self.sp)}\tfl={hex(self.fl)}"
         )
         stack_repr = f"stack_top={'?' if self.sp >= self.memory_size else hex(self.memory[self.sp].val)}"
-        return f"{regs_repr}\t{stack_repr}".expandtabs(10)
+        return f"{regs_repr}\t{stack_repr}".expandtabs(11)
 
 
 class ControlUnit:
@@ -421,7 +421,7 @@ class ControlUnit:
     def __repr__(self):
         state_repr = f"tick={self.ticks}"
         dp_repr = f"{self.dp}"
-        return f"{state_repr}\t{dp_repr}".expandtabs(10)
+        return f"{state_repr}\t{dp_repr}".expandtabs(12)
 
 
 def simulation(code: list[Word], input_tokens: list[str], data_memory_size: int = 0x800, limit: int = 10_000):

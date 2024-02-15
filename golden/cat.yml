@@ -1,0 +1,150 @@
+in_source: |
+  section .text
+
+  start:
+    mov *1001, *1000
+    jmp start
+    halt
+in_stdin: |
+  line
+  line
+  line
+out_code: |-
+  [
+    {
+      "tag": "OPCODE",
+      "op": "movmem2mem"
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "ADDRESS_EXACT",
+        "val": 1000
+      }
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "ADDRESS_EXACT",
+        "val": 1001
+      }
+    },
+    {
+      "tag": "OPCODE",
+      "op": "jmp"
+    },
+    {
+      "tag": "ARGUMENT",
+      "arg": {
+        "tag": "NUMBER",
+        "symbol": "start",
+        "val": 0
+      }
+    },
+    {
+      "tag": "OPCODE",
+      "op": "halt"
+    }
+  ]
+
+out_stdout: |+
+  LoC: 7 code instr: 3
+  line
+  line
+  line
+
+out_log: |
+  DEBUG   machine:execute_next_instruction tick=0      ip=0x0     ar=0x0     dr=0x0     a0=0x0     a1=0x0     a2=0x0     a3=0x0     r0=0x0     r1=0x0     r2=0x0     r3=0x0     sp=0x800   fl=0x0     stack_top=?
+  DEBUG   machine:execute_next_instruction MOVE_MEM_TO_MEM
+  DEBUG   machine:signal_read_memory input: 'l' <- 'ine\nline\nline\n'
+  DEBUG   machine:signal_write_memory output: '' <- 'l'
+  DEBUG   machine:execute_next_instruction tick=9      ip=0x3     ar=0x3e9   dr=0x6c    a0=0x0     a1=0x0     a2=0x0     a3=0x0     r0=0x0     r1=0x0     r2=0x0     r3=0x0     sp=0x800   fl=0x0     stack_top=?
+  DEBUG   machine:execute_next_instruction JUMP
+  DEBUG   machine:execute_next_instruction tick=12     ip=0x0     ar=0x3e9   dr=0x6c    a0=0x0     a1=0x0     a2=0x0     a3=0x0     r0=0x0     r1=0x0     r2=0x0     r3=0x0     sp=0x800   fl=0x0     stack_top=?
+  DEBUG   machine:execute_next_instruction MOVE_MEM_TO_MEM
+  DEBUG   machine:signal_read_memory input: 'i' <- 'ne\nline\nline\n'
+  DEBUG   machine:signal_write_memory output: 'l' <- 'i'
+  DEBUG   machine:execute_next_instruction tick=21     ip=0x3     ar=0x3e9   dr=0x69    a0=0x0     a1=0x0     a2=0x0     a3=0x0     r0=0x0     r1=0x0     r2=0x0     r3=0x0     sp=0x800   fl=0x0     stack_top=?
+  DEBUG   machine:execute_next_instruction JUMP
+  DEBUG   machine:execute_next_instruction tick=24     ip=0x0     ar=0x3e9   dr=0x69    a0=0x0     a1=0x0     a2=0x0     a3=0x0     r0=0x0     r1=0x0     r2=0x0     r3=0x0     sp=0x800   fl=0x0     stack_top=?
+  DEBUG   machine:execute_next_instruction MOVE_MEM_TO_MEM
+  DEBUG   machine:signal_read_memory input: 'n' <- 'e\nline\nline\n'
+  DEBUG   machine:signal_write_memory output: 'li' <- 'n'
+  DEBUG   machine:execute_next_instruction tick=33     ip=0x3     ar=0x3e9   dr=0x6e    a0=0x0     a1=0x0     a2=0x0     a3=0x0     r0=0x0     r1=0x0     r2=0x0     r3=0x0     sp=0x800   fl=0x0     stack_top=?
+  DEBUG   machine:execute_next_instruction JUMP
+  DEBUG   machine:execute_next_instruction tick=36     ip=0x0     ar=0x3e9   dr=0x6e    a0=0x0     a1=0x0     a2=0x0     a3=0x0     r0=0x0     r1=0x0     r2=0x0     r3=0x0     sp=0x800   fl=0x0     stack_top=?
+  DEBUG   machine:execute_next_instruction MOVE_MEM_TO_MEM
+  DEBUG   machine:signal_read_memory input: 'e' <- '\nline\nline\n'
+  DEBUG   machine:signal_write_memory output: 'lin' <- 'e'
+  DEBUG   machine:execute_next_instruction tick=45     ip=0x3     ar=0x3e9   dr=0x65    a0=0x0     a1=0x0     a2=0x0     a3=0x0     r0=0x0     r1=0x0     r2=0x0     r3=0x0     sp=0x800   fl=0x0     stack_top=?
+  DEBUG   machine:execute_next_instruction JUMP
+  DEBUG   machine:execute_next_instruction tick=48     ip=0x0     ar=0x3e9   dr=0x65    a0=0x0     a1=0x0     a2=0x0     a3=0x0     r0=0x0     r1=0x0     r2=0x0     r3=0x0     sp=0x800   fl=0x0     stack_top=?
+  DEBUG   machine:execute_next_instruction MOVE_MEM_TO_MEM
+  DEBUG   machine:signal_read_memory input: '\n' <- 'line\nline\n'
+  DEBUG   machine:signal_write_memory output: 'line' <- '\n'
+  DEBUG   machine:execute_next_instruction tick=57     ip=0x3     ar=0x3e9   dr=0xa     a0=0x0     a1=0x0     a2=0x0     a3=0x0     r0=0x0     r1=0x0     r2=0x0     r3=0x0     sp=0x800   fl=0x0     stack_top=?
+  DEBUG   machine:execute_next_instruction JUMP
+  DEBUG   machine:execute_next_instruction tick=60     ip=0x0     ar=0x3e9   dr=0xa     a0=0x0     a1=0x0     a2=0x0     a3=0x0     r0=0x0     r1=0x0     r2=0x0     r3=0x0     sp=0x800   fl=0x0     stack_top=?
+  DEBUG   machine:execute_next_instruction MOVE_MEM_TO_MEM
+  DEBUG   machine:signal_read_memory input: 'l' <- 'ine\nline\n'
+  DEBUG   machine:signal_write_memory output: 'line\n' <- 'l'
+  DEBUG   machine:execute_next_instruction tick=69     ip=0x3     ar=0x3e9   dr=0x6c    a0=0x0     a1=0x0     a2=0x0     a3=0x0     r0=0x0     r1=0x0     r2=0x0     r3=0x0     sp=0x800   fl=0x0     stack_top=?
+  DEBUG   machine:execute_next_instruction JUMP
+  DEBUG   machine:execute_next_instruction tick=72     ip=0x0     ar=0x3e9   dr=0x6c    a0=0x0     a1=0x0     a2=0x0     a3=0x0     r0=0x0     r1=0x0     r2=0x0     r3=0x0     sp=0x800   fl=0x0     stack_top=?
+  DEBUG   machine:execute_next_instruction MOVE_MEM_TO_MEM
+  DEBUG   machine:signal_read_memory input: 'i' <- 'ne\nline\n'
+  DEBUG   machine:signal_write_memory output: 'line\nl' <- 'i'
+  DEBUG   machine:execute_next_instruction tick=81     ip=0x3     ar=0x3e9   dr=0x69    a0=0x0     a1=0x0     a2=0x0     a3=0x0     r0=0x0     r1=0x0     r2=0x0     r3=0x0     sp=0x800   fl=0x0     stack_top=?
+  DEBUG   machine:execute_next_instruction JUMP
+  DEBUG   machine:execute_next_instruction tick=84     ip=0x0     ar=0x3e9   dr=0x69    a0=0x0     a1=0x0     a2=0x0     a3=0x0     r0=0x0     r1=0x0     r2=0x0     r3=0x0     sp=0x800   fl=0x0     stack_top=?
+  DEBUG   machine:execute_next_instruction MOVE_MEM_TO_MEM
+  DEBUG   machine:signal_read_memory input: 'n' <- 'e\nline\n'
+  DEBUG   machine:signal_write_memory output: 'line\nli' <- 'n'
+  DEBUG   machine:execute_next_instruction tick=93     ip=0x3     ar=0x3e9   dr=0x6e    a0=0x0     a1=0x0     a2=0x0     a3=0x0     r0=0x0     r1=0x0     r2=0x0     r3=0x0     sp=0x800   fl=0x0     stack_top=?
+  DEBUG   machine:execute_next_instruction JUMP
+  DEBUG   machine:execute_next_instruction tick=96     ip=0x0     ar=0x3e9   dr=0x6e    a0=0x0     a1=0x0     a2=0x0     a3=0x0     r0=0x0     r1=0x0     r2=0x0     r3=0x0     sp=0x800   fl=0x0     stack_top=?
+  DEBUG   machine:execute_next_instruction MOVE_MEM_TO_MEM
+  DEBUG   machine:signal_read_memory input: 'e' <- '\nline\n'
+  DEBUG   machine:signal_write_memory output: 'line\nlin' <- 'e'
+  DEBUG   machine:execute_next_instruction tick=105    ip=0x3     ar=0x3e9   dr=0x65    a0=0x0     a1=0x0     a2=0x0     a3=0x0     r0=0x0     r1=0x0     r2=0x0     r3=0x0     sp=0x800   fl=0x0     stack_top=?
+  DEBUG   machine:execute_next_instruction JUMP
+  DEBUG   machine:execute_next_instruction tick=108    ip=0x0     ar=0x3e9   dr=0x65    a0=0x0     a1=0x0     a2=0x0     a3=0x0     r0=0x0     r1=0x0     r2=0x0     r3=0x0     sp=0x800   fl=0x0     stack_top=?
+  DEBUG   machine:execute_next_instruction MOVE_MEM_TO_MEM
+  DEBUG   machine:signal_read_memory input: '\n' <- 'line\n'
+  DEBUG   machine:signal_write_memory output: 'line\nline' <- '\n'
+  DEBUG   machine:execute_next_instruction tick=117    ip=0x3     ar=0x3e9   dr=0xa     a0=0x0     a1=0x0     a2=0x0     a3=0x0     r0=0x0     r1=0x0     r2=0x0     r3=0x0     sp=0x800   fl=0x0     stack_top=?
+  DEBUG   machine:execute_next_instruction JUMP
+  DEBUG   machine:execute_next_instruction tick=120    ip=0x0     ar=0x3e9   dr=0xa     a0=0x0     a1=0x0     a2=0x0     a3=0x0     r0=0x0     r1=0x0     r2=0x0     r3=0x0     sp=0x800   fl=0x0     stack_top=?
+  DEBUG   machine:execute_next_instruction MOVE_MEM_TO_MEM
+  DEBUG   machine:signal_read_memory input: 'l' <- 'ine\n'
+  DEBUG   machine:signal_write_memory output: 'line\nline\n' <- 'l'
+  DEBUG   machine:execute_next_instruction tick=129    ip=0x3     ar=0x3e9   dr=0x6c    a0=0x0     a1=0x0     a2=0x0     a3=0x0     r0=0x0     r1=0x0     r2=0x0     r3=0x0     sp=0x800   fl=0x0     stack_top=?
+  DEBUG   machine:execute_next_instruction JUMP
+  DEBUG   machine:execute_next_instruction tick=132    ip=0x0     ar=0x3e9   dr=0x6c    a0=0x0     a1=0x0     a2=0x0     a3=0x0     r0=0x0     r1=0x0     r2=0x0     r3=0x0     sp=0x800   fl=0x0     stack_top=?
+  DEBUG   machine:execute_next_instruction MOVE_MEM_TO_MEM
+  DEBUG   machine:signal_read_memory input: 'i' <- 'ne\n'
+  DEBUG   machine:signal_write_memory output: 'line\nline\nl' <- 'i'
+  DEBUG   machine:execute_next_instruction tick=141    ip=0x3     ar=0x3e9   dr=0x69    a0=0x0     a1=0x0     a2=0x0     a3=0x0     r0=0x0     r1=0x0     r2=0x0     r3=0x0     sp=0x800   fl=0x0     stack_top=?
+  DEBUG   machine:execute_next_instruction JUMP
+  DEBUG   machine:execute_next_instruction tick=144    ip=0x0     ar=0x3e9   dr=0x69    a0=0x0     a1=0x0     a2=0x0     a3=0x0     r0=0x0     r1=0x0     r2=0x0     r3=0x0     sp=0x800   fl=0x0     stack_top=?
+  DEBUG   machine:execute_next_instruction MOVE_MEM_TO_MEM
+  DEBUG   machine:signal_read_memory input: 'n' <- 'e\n'
+  DEBUG   machine:signal_write_memory output: 'line\nline\nli' <- 'n'
+  DEBUG   machine:execute_next_instruction tick=153    ip=0x3     ar=0x3e9   dr=0x6e    a0=0x0     a1=0x0     a2=0x0     a3=0x0     r0=0x0     r1=0x0     r2=0x0     r3=0x0     sp=0x800   fl=0x0     stack_top=?
+  DEBUG   machine:execute_next_instruction JUMP
+  DEBUG   machine:execute_next_instruction tick=156    ip=0x0     ar=0x3e9   dr=0x6e    a0=0x0     a1=0x0     a2=0x0     a3=0x0     r0=0x0     r1=0x0     r2=0x0     r3=0x0     sp=0x800   fl=0x0     stack_top=?
+  DEBUG   machine:execute_next_instruction MOVE_MEM_TO_MEM
+  DEBUG   machine:signal_read_memory input: 'e' <- '\n'
+  DEBUG   machine:signal_write_memory output: 'line\nline\nlin' <- 'e'
+  DEBUG   machine:execute_next_instruction tick=165    ip=0x3     ar=0x3e9   dr=0x65    a0=0x0     a1=0x0     a2=0x0     a3=0x0     r0=0x0     r1=0x0     r2=0x0     r3=0x0     sp=0x800   fl=0x0     stack_top=?
+  DEBUG   machine:execute_next_instruction JUMP
+  DEBUG   machine:execute_next_instruction tick=168    ip=0x0     ar=0x3e9   dr=0x65    a0=0x0     a1=0x0     a2=0x0     a3=0x0     r0=0x0     r1=0x0     r2=0x0     r3=0x0     sp=0x800   fl=0x0     stack_top=?
+  DEBUG   machine:execute_next_instruction MOVE_MEM_TO_MEM
+  DEBUG   machine:signal_read_memory input: '\n' <- ''
+  DEBUG   machine:signal_write_memory output: 'line\nline\nline' <- '\n'
+  DEBUG   machine:execute_next_instruction tick=177    ip=0x3     ar=0x3e9   dr=0xa     a0=0x0     a1=0x0     a2=0x0     a3=0x0     r0=0x0     r1=0x0     r2=0x0     r3=0x0     sp=0x800   fl=0x0     stack_top=?
+  DEBUG   machine:execute_next_instruction JUMP
+  DEBUG   machine:execute_next_instruction tick=180    ip=0x0     ar=0x3e9   dr=0xa     a0=0x0     a1=0x0     a2=0x0     a3=0x0     r0=0x0     r1=0x0     r2=0x0     r3=0x0     sp=0x800   fl=0x0     stack_top=?
+  DEBUG   machine:execute_next_instruction MOVE_MEM_TO_MEM
+  WARNING machine:simulation    Input buffer is empty
+  INFO    machine:main          instr: 30 ticks: 183
