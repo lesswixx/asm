@@ -99,37 +99,35 @@ opcode_by_str: dict[str, Opcode] = {op: op for op in Opcode}
 
 
 REG_TYPE = [ArgType.REGISTER]
-NUMBER_TYPE = [ArgType.NUMBER, ArgType.LABEL]
+NUMBER_TYPE = [ArgType.NUMBER]
+NUMBER_OR_LABEL_TYPE = [ArgType.NUMBER, ArgType.LABEL]
+MEMORY_TYPE = [ArgType.ADDRESS_REGISTER, ArgType.ADDRESS_EXACT]
+REG_OP_NUMBER_TYPE = [ArgType.REGISTER_OP_NUMBER]
+LABEL_TYPE = [ArgType.LABEL]
 
 
 command_args: dict[str, tuple[int, list[list[ArgType]]]] = {
-    Opcode.MOVE_NUM_TO_REG: [(1, [ArgType.REGISTER]), (0, [ArgType.NUMBER, ArgType.LABEL])],
-    Opcode.MOVE_NUM_TO_MEM: [
-        (1, [ArgType.ADDRESS_REGISTER, ArgType.ADDRESS_EXACT]),
-        (0, [ArgType.NUMBER, ArgType.LABEL]),
-    ],
-    Opcode.MOVE_REG_TO_REG: [(1, [ArgType.REGISTER]), (0, [ArgType.REGISTER])],
-    Opcode.MOVE_REG_TO_MEM: [(1, [ArgType.ADDRESS_REGISTER, ArgType.ADDRESS_EXACT]), (0, [ArgType.REGISTER])],
-    Opcode.MOVE_MEM_TO_REG: [(1, [ArgType.REGISTER]), (0, [ArgType.ADDRESS_REGISTER, ArgType.ADDRESS_EXACT])],
-    Opcode.MOVE_MEM_TO_MEM: [
-        (1, [ArgType.ADDRESS_REGISTER, ArgType.ADDRESS_EXACT]),
-        (0, [ArgType.ADDRESS_REGISTER, ArgType.ADDRESS_EXACT]),
-    ],
-    Opcode.MOVE_REG_OP_NUM_TO_REG: [(1, [ArgType.REGISTER]), (0, [ArgType.REGISTER_OP_NUMBER])],
-    Opcode.INCREMENT: [(0, [ArgType.REGISTER])],
-    Opcode.DECREMENT: [(0, [ArgType.REGISTER])],
-    Opcode.ADD: [(0, [ArgType.REGISTER]), (1, [ArgType.NUMBER])],
-    Opcode.ADD_REG: [(0, [ArgType.REGISTER]), (1, [ArgType.REGISTER])],
-    Opcode.SUBTRACT: [(0, [ArgType.REGISTER]), (1, [ArgType.NUMBER])],
-    Opcode.DIVIDE: [(0, [ArgType.REGISTER]), (1, [ArgType.NUMBER])],
-    Opcode.MODULO: [(0, [ArgType.REGISTER]), (1, [ArgType.NUMBER])],
-    Opcode.COMPARE: [(0, [ArgType.REGISTER]), (1, [ArgType.NUMBER])],
-    Opcode.PUSH: [(0, [ArgType.REGISTER])],
-    Opcode.POP: [(0, [ArgType.REGISTER])],
-    Opcode.JUMP_EQUAL: [(0, [ArgType.LABEL])],
-    Opcode.JUMP_NOT_EQUAL: [(0, [ArgType.LABEL])],
-    Opcode.JUMP: [(0, [ArgType.LABEL])],
-    Opcode.CALL: [(0, [ArgType.LABEL])],
+    Opcode.MOVE_NUM_TO_REG: [(1, REG_TYPE), (0, NUMBER_OR_LABEL_TYPE)],
+    Opcode.MOVE_NUM_TO_MEM: [(1, MEMORY_TYPE), (0, NUMBER_OR_LABEL_TYPE)],
+    Opcode.MOVE_REG_TO_REG: [(1, REG_TYPE), (0, REG_TYPE)],
+    Opcode.MOVE_REG_TO_MEM: [(1, MEMORY_TYPE), (0, REG_TYPE)],
+    Opcode.MOVE_MEM_TO_REG: [(1, REG_TYPE), (0, MEMORY_TYPE)],
+    Opcode.MOVE_MEM_TO_MEM: [(1, MEMORY_TYPE), (0, MEMORY_TYPE)],
+    Opcode.MOVE_REG_OP_NUM_TO_REG: [(1, REG_TYPE), (0, REG_OP_NUMBER_TYPE)],
+    Opcode.INCREMENT: [(0, REG_TYPE)],
+    Opcode.DECREMENT: [(0, REG_TYPE)],
+    Opcode.ADD: [(0, REG_TYPE), (1, NUMBER_TYPE)],
+    Opcode.ADD_REG: [(0, REG_TYPE), (1, REG_TYPE)],
+    Opcode.SUBTRACT: [(0, REG_TYPE), (1, NUMBER_TYPE)],
+    Opcode.DIVIDE: [(0, REG_TYPE), (1, NUMBER_TYPE)],
+    Opcode.MODULO: [(0, REG_TYPE), (1, NUMBER_TYPE)],
+    Opcode.COMPARE: [(0, REG_TYPE), (1, NUMBER_TYPE)],
+    Opcode.PUSH: [(0, REG_TYPE)],
+    Opcode.POP: [(0, REG_TYPE)],
+    Opcode.JUMP_EQUAL: [(0, LABEL_TYPE)],
+    Opcode.JUMP_NOT_EQUAL: [(0, LABEL_TYPE)],
+    Opcode.JUMP: [(0, LABEL_TYPE)],
+    Opcode.CALL: [(0, LABEL_TYPE)],
     Opcode.RETURN: [],
     Opcode.HALT: [],
 }
